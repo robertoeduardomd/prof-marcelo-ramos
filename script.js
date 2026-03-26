@@ -1,0 +1,429 @@
+// =======================
+// 🎸 CONFIGURAÇÕES
+// =======================
+
+const instrumentos = {
+  guitarra: ["E", "A", "D", "G", "B", "E"],
+
+  baixo4: ["E", "A", "D", "G"],
+  baixo5: ["B", "E", "A", "D", "G"],
+
+  cavaquinho: ["D", "G", "B", "D"],
+
+  bandolim4: ["G", "D", "A", "E"],
+  bandolim5: ["C", "G", "D", "A", "E"],
+};
+
+let afinacao = instrumentos["guitarra"];
+let bloqueado = false;
+let posicaoAtual = "1";
+
+const notas = [
+  ["C"],
+  ["C#/Db"],
+  ["D"],
+  ["D#/Eb"],
+  ["E"],
+  ["F"],
+  ["F#/Gb"],
+  ["G"],
+  ["G#/Ab"],
+  ["A"],
+  ["A#/Bb"],
+  ["B"],
+];
+
+// =======================
+// 🎯 DOM
+// =======================
+
+const perguntaEl = document.getElementById("pergunta");
+const opcoesEl = document.getElementById("opcoes");
+const resultado = document.getElementById("resultado");
+
+const selectInstrumento = document.getElementById("instrumento");
+const selectPosicao = document.getElementById("posicao");
+const configEl = document.querySelector(".ldld");
+
+const btnIniciar = document.getElementById("btnIniciar");
+
+const placarEl = document.getElementById("placar");
+const timerEl = document.getElementById("timer");
+
+// =======================
+// 🎮 ESTADO
+// =======================
+
+let listaPerguntas = [];
+let indiceAtual = 0;
+let perguntaAtual = null;
+
+let acertos = 0;
+let erros = 0;
+let total = 0;
+
+let jogoIniciado = false;
+
+// ⏱️ TIMER
+let tempo = 0;
+let intervalo;
+
+// =======================
+// 🔒 SCROLL CONTROL
+// =======================
+
+function travarScroll() {
+  document.body.style.overflow = "hidden";
+}
+
+function liberarScroll() {
+  document.body.style.overflow = "auto";
+}
+
+// =======================
+// 🎧 ÁUDIO
+// =======================
+
+let synth;
+
+function criarSynth() {
+  const instrumento = selectInstrumento.value;
+
+  const reverb = new Tone.Reverb({
+    decay: 2,
+    wet: 0.3,
+  }).toDestination();
+
+  if (instrumento.includes("baixo")) {
+    synth = new Tone.MonoSynth({ oscillator: { type: "square" } });
+  } else if (instrumento.includes("guitarra")) {
+    synth = new Tone.MonoSynth({ oscillator: { type: "sawtooth" } });
+  } else {
+    synth = new Tone.Synth({ oscillator: { type: "triangle" } });
+  }
+
+  synth.connect(reverb);
+}
+
+document.body.addEventListener(
+  "click",
+  async () => {
+    await Tone.start();
+  },
+  { once: true },
+);
+
+function mapearNota(nota) {
+  return nota.includes("/") ? nota.split("/")[0] : nota;
+}
+
+function tocarSom(nota) {
+  if (!synth) return;
+
+  const oitavas = {
+    guitarra: 4,
+    baixo4: 2,
+    baixo5: 2,
+    cavaquinho: 5,
+    bandolim4: 5,
+    bandolim5: 4,
+  };
+
+  const instrumento = selectInstrumento.value;
+  const notaFormatada = mapearNota(nota) + oitavas[instrumento];
+
+  synth.triggerAttackRelease(notaFormatada, "8n");
+}
+
+// =======================
+// 🧠 LÓGICA
+// =======================
+
+function encontrarIndice(nota) {
+  return notas.findIndex((g) => g.includes(nota));
+}
+
+function obterIntervaloPosicao() {
+  switch (posicaoAtual) {
+    case "1":
+      return { min: 0, max: 4 };
+    case "2":
+      return { min: 5, max: 8 };
+    case "3":
+      return { min: 9, max: 12 };
+    case "1-2":
+      return { min: 0, max: 8 };
+    case "2-3":
+      return { min: 5, max: 12 };
+    case "todas":
+      return { min: 0, max: 12 };
+    default:
+      return { min: 0, max: 4 };
+  }
+}
+
+function gerarListaPerguntas() {
+  listaPerguntas = [];
+
+  const { min, max } = obterIntervaloPosicao();
+
+  afinacao.forEach((_, corda) => {
+    for (let casa = min; casa <= max; casa++) {
+      listaPerguntas.push({ corda, casa });
+    }
+  });
+
+  embaralhar(listaPerguntas);
+  indiceAtual = 0;
+}
+
+function embaralhar(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function gerarPergunta() {
+  if (indiceAtual >= listaPerguntas.length) {
+    finalizarJogo();
+    return;
+  }
+
+  perguntaAtual = listaPerguntas[indiceAtual];
+
+  const { corda, casa } = perguntaAtual;
+
+  const notaBase = afinacao[corda];
+  const indiceBase = encontrarIndice(notaBase);
+  const indiceFinal = (indiceBase + casa) % 12;
+
+  perguntaAtual.resposta = notas[indiceFinal];
+
+  perguntaEl.innerText = `Corda ${afinacao.length - corda} | Casa ${casa}`;
+
+  document
+    .querySelectorAll("input[name='nota']")
+    .forEach((i) => (i.checked = false));
+}
+
+// =======================
+// 🎯 OPÇÕES
+// =======================
+
+function criarOpcoes() {
+  opcoesEl.innerHTML = "";
+
+  notas.forEach((grupo) => {
+    grupo.forEach((nota) => {
+      const label = document.createElement("label");
+      label.className = "opcao";
+
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "nota";
+      input.value = nota;
+
+      const span = document.createElement("span");
+      span.textContent = nota;
+
+      input.addEventListener("click", () => {
+        input.checked = true;
+        tocarSom(nota);
+        responder();
+      });
+
+      label.appendChild(input);
+      label.appendChild(span);
+
+      opcoesEl.appendChild(label);
+    });
+  });
+}
+
+// =======================
+// 📊 SCORE
+// =======================
+
+function atualizarPlacar() {
+  placarEl.innerText = `Acertos: ${acertos} | Erros: ${erros} | Total: ${total}`;
+}
+
+// =======================
+// ⏱️ TIMER
+// =======================
+
+function iniciarTimer() {
+  clearInterval(intervalo);
+  tempo = 0;
+
+  intervalo = setInterval(() => {
+    tempo++;
+    timerEl.innerText = `Tempo: ${tempo}s`;
+  }, 1000);
+}
+
+// =======================
+// 🔔 TOAST
+// =======================
+
+function mostrarToast(msg, tipo) {
+  resultado.innerText = msg;
+  resultado.className = "";
+  resultado.classList.add("show", tipo);
+
+  setTimeout(() => {
+    resultado.classList.remove("show");
+  }, 1000);
+}
+
+// =======================
+// 🏁 FINALIZAR
+// =======================
+
+function finalizarJogo() {
+  clearInterval(intervalo);
+
+  liberarScroll();
+
+  perguntaEl.innerText = "🎉 Finalizado!";
+  mostrarToast(`Tempo: ${tempo}s | Acertos: ${acertos}`, "sucesso");
+
+  configEl.style.display = "flex";
+
+  btnIniciar.style.display = "block";
+  btnIniciar.innerText = "Reiniciar";
+
+  jogoIniciado = false;
+}
+
+// =======================
+// ✅ RESPOSTA
+// =======================
+
+function responder() {
+  if (!jogoIniciado || bloqueado) return;
+
+  bloqueado = true;
+
+  const selecionado = document.querySelector("input[name='nota']:checked");
+  if (!selecionado) return;
+
+  const valor = selecionado.value;
+  const correto = perguntaAtual.resposta.includes(valor);
+
+  total++;
+
+  if (correto) {
+    acertos++;
+    mostrarToast("✅ Correto!", "sucesso");
+  } else {
+    erros++;
+    mostrarToast("❌ " + perguntaAtual.resposta.join(" ou "), "erro");
+  }
+
+  atualizarPlacar();
+
+  indiceAtual++;
+
+  setTimeout(() => {
+    bloqueado = false;
+    gerarPergunta();
+  }, 150);
+}
+
+// =======================
+// 🚀 INICIAR JOGO
+// =======================
+
+function iniciarJogo() {
+  jogoIniciado = true;
+
+  travarScroll();
+
+  acertos = 0;
+  erros = 0;
+  total = 0;
+
+  configEl.style.display = "none";
+  btnIniciar.style.display = "none";
+  perguntaEl.style.display = "block";
+
+  gerarListaPerguntas();
+  gerarPergunta();
+  atualizarPlacar();
+  iniciarTimer();
+}
+
+// =======================
+// 🔄 EVENTOS
+// =======================
+
+selectInstrumento.addEventListener("change", (e) => {
+  afinacao = instrumentos[e.target.value];
+  criarSynth();
+});
+
+selectPosicao.addEventListener("change", (e) => {
+  posicaoAtual = e.target.value;
+});
+
+btnIniciar.addEventListener("click", iniciarJogo);
+
+// =======================
+// 🚀 START
+// =======================
+
+criarSynth();
+criarOpcoes();
+
+// =======================
+// 💰 PIX
+// =======================
+
+function copiarPix() {
+  const chave = "6184789603";
+
+  navigator.clipboard.writeText(chave).then(() => {
+    alert("Chave PIX copiada!");
+  });
+}
+// =======================
+// ❓ AJUDA (IMAGENS)
+// =======================
+
+const btnAjuda = document.getElementById("btnAjuda");
+const modalAjuda = document.getElementById("modalAjuda");
+const fecharModal = document.getElementById("fecharModal");
+const imgInstrumento = document.getElementById("imagemInstrumento");
+
+// 🔥 MAPEAMENTO DAS IMAGENS
+const imagens = {
+  guitarra: "imgs/guitarra.jpg",
+  baixo4: "imgs/baixo4.jpg",
+  baixo5: "imgs/baixo5.jpg",
+  cavaquinho: "imgs/cavaquinho.png",
+  bandolim4: "imgs/bandolim4.png",
+  bandolim5: "imgs/bandolim5.png",
+};
+
+// ABRIR
+btnAjuda.addEventListener("click", () => {
+  const instrumento = selectInstrumento.value;
+
+  imgInstrumento.src = imagens[instrumento];
+
+  modalAjuda.style.display = "flex";
+});
+
+// FECHAR
+fecharModal.addEventListener("click", () => {
+  modalAjuda.style.display = "none";
+});
+
+// FECHAR CLICANDO FORA
+modalAjuda.addEventListener("click", (e) => {
+  if (e.target === modalAjuda) {
+    modalAjuda.style.display = "none";
+  }
+});

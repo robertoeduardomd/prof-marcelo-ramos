@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Treino de Notas Professor Marcelo</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+      integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>Notas do instrumento</h1>
+        <a href="https://api.whatsapp.com/send?phone=556184789603">
+          <h3>Prof. Marcelo Ramos <i class="fab fa-whatsapp icon"></i></h3>
+        </a>
+        <br />
+        <!-- NOVO: seletor de instrumento -->
+        <div class="ldld">
+         <select id="instrumento">
+  <option value="guitarra">Guitarra/Violão (6 cordas)</option>
+  <option value="baixo4">Baixo (4 cordas)</option>
+  <option value="baixo5">Baixo (5 cordas)</option>
+  <option value="cavaquinho">Cavaquinho (4 cordas)</option>
+  <option value="bandolim4">Bandolim (4 cordas)</option>
+  <option value="bandolim5">Bandolim (5 cordas) </option>
+</select>
+          <select id="posicao">
+            <option value="1">Posição 1 (0–4 casa)</option>
+            <option value="2">Posição 2 (5–8 casa)</option>
+            <option value="3">Posição 3 (9–12 casa)</option>
+             <option value="1-2">Posição 1–2 (0–8 casa)</option>
+  <option value="2-3">Posição 2–3 (5–12 casa)</option>
+  <option value="todas">Todas (0–12)</option>
+          </select>
+          
+          <button id="btnAjuda" class="btn-ajuda-inline">?</button>
+        </div>
+        <button id="btnIniciar">Iniciar</button>
+        <p id="placar">Acertos: 0 | Erros: 0 | Total: 0</p>
+        <p id="timer">Tempo: 0s</p>
+
+        <p id="pergunta" style="display: none"></p>
+        <br />
+        <p id="resultado"></p>
+        <div id="opcoes" class="opcoes"></div>
+
+       
+      </div>
+    </div>
+    <div class="apoio">
+  <p class="apoio-texto">
+    🎵 Gostou do treino?
+    <br />
+    
+    <br />
+    Apoie meu trabalho com doaçao de R$10 no pix❤️
+  </p>
+
+  <button class="btnpix" onclick="copiarPix()">Copiar chave PIX</button>
+</div>
+<div id="modalAjuda" class="modal-ajuda">
+  <button id="fecharModal" class="fechar-modal"><p>✕</p></button>
+  <img id="imagemInstrumento" src="" />
+</div>
+    <script src="https://unpkg.com/tone"></script>
+    <script src="script.js"></script>
+    <footer>
+      Desenvolvidor por
+      <a href="https://roberto-eduardo-portfolio.vercel.app/">
+        Roberto Eduardo</a
+      >
+    </footer>
+  </body>
+</html>
