@@ -382,7 +382,7 @@ criarOpcoes();
 // =======================
 
 function copiarPix() {
-  const chave = "6184789603";
+  const chave = "61984789603";
 
   navigator.clipboard.writeText(chave).then(() => {
     alert("Chave PIX copiada!");
