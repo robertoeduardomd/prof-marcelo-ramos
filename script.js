@@ -90,8 +90,8 @@ function criarSynth() {
   const instrumento = selectInstrumento.value;
 
   const reverb = new Tone.Reverb({
-    decay: 2,
-    wet: 0.3,
+    decay: 1,
+    wet: 0.5,
   }).toDestination();
 
   if (instrumento.includes("baixo")) {
@@ -132,7 +132,7 @@ function tocarSom(nota) {
   const instrumento = selectInstrumento.value;
   const notaFormatada = mapearNota(nota) + oitavas[instrumento];
 
-  synth.triggerAttackRelease(notaFormatada, "8n");
+  synth.triggerAttackRelease(notaFormatada, "16n");
 }
 
 // =======================
