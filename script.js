@@ -38,6 +38,7 @@ const notas = [
 // =======================
 
 const perguntaEl = document.getElementById("pergunta");
+const resultadoFinalEl = document.getElementById("resultadoFinal");
 const opcoesEl = document.getElementById("opcoes");
 const resultado = document.getElementById("resultado");
 
@@ -61,7 +62,7 @@ let perguntaAtual = null;
 let acertos = 0;
 let erros = 0;
 let total = 0;
-
+let listaErros = [];
 let jogoIniciado = false;
 
 // ⏱️ TIMER
@@ -282,20 +283,42 @@ function mostrarToast(msg, tipo) {
 // =======================
 
 function finalizarJogo() {
+  
   clearInterval(intervalo);
 
   liberarScroll();
 
-  perguntaEl.innerText = "🎉 Finalizado!";
-  mostrarToast(`Tempo: ${tempo}s | Acertos: ${acertos}`, "sucesso");
+  let textoFinal = "\n\n";
+
+  if (listaErros.length > 0) {
+    textoFinal += "Erros:\n\n";
+
+    listaErros.forEach((erro, index) => {
+      textoFinal += `${index + 1}) Corda ${erro.corda} | Casa ${erro.casa}\n`;
+      textoFinal += `Correta: ${erro.correta} | Você marcou: ${erro.marcada}\n\n`;
+    });
+  } else {
+    textoFinal += "Sem erros 🎉 Parabéns";
+  }
+
+ perguntaEl.innerText = "🎉 Finalizado!";
+
+
+resultadoFinalEl.innerText = textoFinal;
+resultadoFinalEl.style.display = "block";
+
+
+resultadoFinalEl.classList.add("resultado-erro");
 
   configEl.style.display = "flex";
+  
 
   btnIniciar.style.display = "block";
   btnIniciar.innerText = "Reiniciar";
 
   jogoIniciado = false;
 }
+
 
 // =======================
 // ✅ RESPOSTA
@@ -304,10 +327,10 @@ function finalizarJogo() {
 function responder() {
   if (!jogoIniciado || bloqueado) return;
 
-  bloqueado = true;
-
   const selecionado = document.querySelector("input[name='nota']:checked");
   if (!selecionado) return;
+
+  bloqueado = true;
 
   const valor = selecionado.value;
   const correto = perguntaAtual.resposta.includes(valor);
@@ -320,6 +343,12 @@ function responder() {
   } else {
     erros++;
     mostrarToast("❌ " + perguntaAtual.resposta.join(" ou "), "erro");
+    listaErros.push({
+      corda: afinacao.length - perguntaAtual.corda,
+      casa: perguntaAtual.casa,
+      correta: perguntaAtual.resposta.join(" ou "),
+      marcada: valor,
+    });
   }
 
   atualizarPlacar();
@@ -344,10 +373,14 @@ function iniciarJogo() {
   acertos = 0;
   erros = 0;
   total = 0;
-
+  listaErros = [];
   configEl.style.display = "none";
   btnIniciar.style.display = "none";
   perguntaEl.style.display = "block";
+
+  resultadoFinalEl.style.display = "none";
+resultadoFinalEl.classList.remove("resultado-erro");
+resultadoFinalEl.innerText = "";
 
   gerarListaPerguntas();
   gerarPergunta();

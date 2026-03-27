@@ -104,11 +104,32 @@ select option {
 }
 
 #pergunta {
-  font-size: 30px;
-  text-align: center;
+  font-size: 22px;
+  line-height: 1.2;
+  text-align: left;
   margin-bottom: 10px;
+ 
+}
+#resultadoFinal {
+  width: 100%;
+  display: none;
+  font-size: 13px;
+  line-height: 1.1;
+  text-align: left;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
 }
 
+.resultado-erro {
+  background: #8B0000;
+  color: white;
+}
+
+.resultado-ok {
+  background: #0f5132;
+  color: white;
+}
 /* GRID DE OPÇÕES */
 .opcoes {
   display: flex;
