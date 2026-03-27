@@ -1,0 +1,5 @@
+{
+  "routes": [
+    { "src": "/intervalos", "dest": "/intervalos.html" }
+  ]
+}
