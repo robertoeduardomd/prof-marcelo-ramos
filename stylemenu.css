@@ -13,6 +13,9 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* CENTRALIZA NA TELA */
@@ -36,7 +39,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    backdrop-filter: blur(30);
+    backdrop-filter: blur(10);
 }
 
 /* BOTÃO PIX (VARIAÇÃO) */
@@ -117,9 +120,191 @@ button:hover {
 button:active {
     transform: scale(0.97);
 }
-.btnnotas{
+
+.btnnotas {
     background: rgb(37, 37, 37);
 }
+
+footer {
+    width: 100%;
+    backdrop-filter: blur(10px);
+    background: rgba(216, 177, 5, 0.212);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    font-size: 14px;
+}
+
+footer a {
+    color: rgba(255, 196, 0, 0);
+    padding: 12px;
+    transition: 0.1s;
+}
+
+footer a:hover {
+    transform: scale(1.1);
+}
+
+.redessociais,
+.funcionamento {
+    height: 300px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+
+.iconewwp {
+    color: black;
+    z-index: 99;
+    position: fixed;
+    right: 10px;
+    bottom: 100px;
+    width: 50px;
+    transition: .5s;
+    cursor: pointer;
+    opacity: 1;
+}
+
+.iconewwp:hover {
+    transform: scale(1.1);
+}
+
+.iconewwp img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    float: left;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: contain;
+}
+
+.iconewwp:before {
+    right: 60px;
+    padding: 0;
+
+    border-radius: 30px;
+    position: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: sans-serif;
+    content: "Falar com Marcelo";
+    outline: none;
+    text-align: center;
+    text-decoration: none;
+    background-color: green;
+    color: white;
+    font-size: 16px;
+    width: 0;
+    height: 10px;
+    overflow: hidden;
+    transition: .2s ease;
+}
+
+.iconewwp:hover::before {
+    padding: 10px;
+    width: 150px;
+}
+
+
+footer h3 {
+    font-size: 50px;
+
+}
+
+footer h4 {
+    color: rgb(0, 0, 0);
+    font-size: 30px;
+    font-family: sans-serif;
+    padding-bottom: 10px;
+
+}
+
+.funcionamento>p {
+    display: block;
+
+}
+
+.ulredes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.ulredes li {
+    margin-top: 10px;
+    list-style: none;
+}
+
+.ulredes li a {
+    width: 55px;
+    height: 55px;
+    background-color: #fff;
+    text-align: center;
+    line-height: 40px;
+    font-size: 35px;
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid #fff;
+    z-index: 1;
+}
+
+.ulredes li a .icon {
+    position: relative;
+    color: #262626;
+    transition: .5s;
+    z-index: 3;
+}
+
+.ulredes li a:hover .icon {
+    color: #fff;
+    transform: rotateY(360deg);
+}
+
+.ulredes li a:before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f00;
+    transition: .5s;
+    z-index: 2;
+}
+
+.ulredes li a:hover:before {
+    top: 0;
+}
+
+.ulredes li:nth-child(2) a:before {
+    background: linear-gradient(45deg, #f09533a6 0%, #e6693c93 25%, #dc27429d 50%, #cc2366 75%, #bc1888 100%);
+
+}
+
+
+.ulredes li:nth-child(3) a:before {
+    background: #11ad03ab;
+}
+
 /* RESPONSIVO */
 @media (max-width: 768px) {
     .perfil {
@@ -134,4 +319,21 @@ button:active {
     .foto {
         order: -1;
     }
+}
+.devpor{
+    width: 100%;
+    min-height: 40px;
+    flex-direction: row;
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.redudu {
+    color: orange;
+    transition: 0.3s;
+}
+
+.redudu:hover {
+    font-size: 16px;
 }
