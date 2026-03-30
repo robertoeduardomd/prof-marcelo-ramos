@@ -1,5 +1,5 @@
 {
   "routes": [
-    { "src": "/intervalos", "dest": "/intervalos.html" }
+    { "src": "/intervalos", "dest": "in/index.html" }
   ]
 }
