@@ -1,0 +1,137 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: sans-serif;
+    background-color: #f3f4f6;
+
+    /* FUNDO MUSICAL */
+    background-image: url("imgs/fundomusicaltonspasteis.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* CENTRALIZA NA TELA */
+.wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* CARD */
+.card {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    backdrop-filter: blur(30);
+}
+
+/* BOTÃO PIX (VARIAÇÃO) */
+.btnpix {
+    background: rgb(0, 120, 0);
+}
+
+/* PERFIL */
+.perfil {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+/* TEXTO */
+.texto {
+    flex: 1;
+}
+
+.texto h1 {
+    font-size: 28px;
+    margin-bottom: 12px;
+    color: #111827;
+}
+
+.texto p {
+    text-align: justify;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+/* FOTO */
+.foto {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.foto img {
+    width: 100%;
+    max-width: 250px;
+    border-radius: 16px;
+}
+
+/* BOTÕES */
+.apps {
+    margin-top: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+/* BOTÃO GRANDE */
+.btn,
+button {
+    flex: 1;
+    text-align: center;
+    padding: 20px;
+    background: #1e40af;
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 14px;
+    transition: 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+/* HOVER */
+.btn:hover,
+button:hover {
+    background: #2563eb;
+}
+
+/* CLICK */
+.btn:active,
+button:active {
+    transform: scale(0.97);
+}
+.btnnotas{
+    background: rgb(37, 37, 37);
+}
+/* RESPONSIVO */
+@media (max-width: 768px) {
+    .perfil {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .apps {
+        flex-direction: column;
+    }
+
+    .foto {
+        order: -1;
+    }
+}

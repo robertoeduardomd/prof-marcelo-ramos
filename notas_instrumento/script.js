@@ -91,14 +91,20 @@ function criarSynth() {
   const instrumento = selectInstrumento.value;
 
   const reverb = new Tone.Reverb({
-    decay: 1,
-    wet: 0.5,
+    decay: 1.5,
+    wet: 0.3,
   }).toDestination();
 
   if (instrumento.includes("baixo")) {
-    synth = new Tone.MonoSynth({ oscillator: { type: "square" } });
+    synth = new Tone.MonoSynth({ 
+      oscillator: { type: "square" },
+      envelope: { attack: 0.05, decay: 0.2, sustain: 0.4, release: 0.8 },
+      filter: { Q: 2, type: "lowpass", rolloff: -24 }
+    });
+    synth.volume.value = 3;
   } else if (instrumento.includes("guitarra")) {
     synth = new Tone.MonoSynth({ oscillator: { type: "sawtooth" } });
+    synth.volume.value = -5;
   } else {
     synth = new Tone.Synth({ oscillator: { type: "triangle" } });
   }
@@ -118,24 +124,42 @@ function mapearNota(nota) {
   return nota.includes("/") ? nota.split("/")[0] : nota;
 }
 
-function tocarSom(nota) {
-  if (!synth) return;
+// 🔥 NOVO: oitavas reais por instrumento
+const oitavasPorCorda = {
+  guitarra: [2, 2, 3, 3, 3, 4], // corda 6 → 1
+  baixo4: [1, 1, 2, 2],
+  baixo5: [0, 1, 1, 2, 2],
+  cavaquinho: [4, 4, 4, 4],
+  bandolim4: [3, 3, 4, 4],
+  bandolim5: [3, 3, 3, 4, 4],
+};
 
-  const oitavas = {
-    guitarra: 4,
-    baixo4: 2,
-    baixo5: 2,
-    cavaquinho: 5,
-    bandolim4: 5,
-    bandolim5: 4,
-  };
+
+
+// 🔥 AGORA AO CLICAR NA OPÇÃO
+function tocarSom(nota) {
+  if (!synth || !perguntaAtual) return;
 
   const instrumento = selectInstrumento.value;
-  const notaFormatada = mapearNota(nota) + oitavas[instrumento];
 
-  synth.triggerAttackRelease(notaFormatada, "16n");
+  const corda = perguntaAtual.corda;
+  const casa = perguntaAtual.casa;
+
+  // 🔥 pega posição real
+  const notaBase = afinacao[corda];
+  const indiceBase = encontrarIndice(notaBase);
+  const indiceFinal = indiceBase + casa;
+
+  // 🔥 pega a NOTA CLICADA (ESSENCIAL)
+  const notaIndex = encontrarIndice(nota);
+
+  const oitavaBase = oitavasPorCorda[instrumento][corda];
+  const oitavaFinal = oitavaBase + Math.floor(indiceFinal / 12);
+
+  const notaFinal = mapearNota(nota) + oitavaFinal;
+
+  synth.triggerAttackRelease(notaFinal, "16n");
 }
-
 // =======================
 // 🧠 LÓGICA
 // =======================
@@ -260,7 +284,10 @@ function iniciarTimer() {
 
   intervalo = setInterval(() => {
     tempo++;
-    timerEl.innerText = `Tempo: ${tempo}s`;
+    // AJUSTE: Formatação para MM:SS
+    const min = Math.floor(tempo / 60).toString().padStart(2, "0");
+    const seg = (tempo % 60).toString().padStart(2, "0");
+    timerEl.innerText = `Tempo: ${min}:${seg}`;
   }, 1000);
 }
 
@@ -301,7 +328,7 @@ function finalizarJogo() {
     textoFinal += "Sem erros 🎉 Parabéns";
   }
 
- perguntaEl.innerText = "🎉 Finalizado!";
+  perguntaEl.innerText = "🎉 Finalizado!";
 
 
 resultadoFinalEl.innerText = textoFinal;
@@ -432,12 +459,12 @@ const imgInstrumento = document.getElementById("imagemInstrumento");
 
 // 🔥 MAPEAMENTO DAS IMAGENS
 const imagens = {
-  guitarra: "imgs/guitarra.jpg",
-  baixo4: "imgs/baixo4.jpg",
-  baixo5: "imgs/baixo5.jpg",
-  cavaquinho: "imgs/cavaquinho.png",
-  bandolim4: "imgs/bandolim4.png",
-  bandolim5: "imgs/bandolim5.png",
+  guitarra: "../imgs/guitarra.jpg",
+  baixo4: "../imgs/baixo4.jpg",
+  baixo5: "../imgs/baixo5.jpg",
+  cavaquinho: "../imgs/cavaquinho.png",
+  bandolim4: "../imgs/bandolim4.png",
+  bandolim5: "../imgs/bandolim5.png",
 };
 
 // ABRIR
