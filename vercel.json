@@ -1,0 +1,6 @@
+{
+  "routes": [
+    { "src": "/intervalos", "dest": "intervalos.html" }
+    { "src": "/notas_instrumento", "dest": "notas_instrumento.html" }
+  ]
+}
