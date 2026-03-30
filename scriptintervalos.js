@@ -91,17 +91,34 @@ document.body.addEventListener("click", async () => {
 
 function tocarIntervalo(nota1, nota2) {
   if (!synth) return;
+
   const idx1 = mapaNotas[nota1];
   const idx2 = mapaNotas[nota2];
-  const n1 = Tone.Frequency(idx1 + 60, "midi");
-  const n2 = Tone.Frequency(idx2 + 60, "midi");
+
+  let midiBase = 60 + idx1;
+  let midiAlvo = 60 + idx2;
+
+  // 🔥 calcula distância real
+  let diferenca = idx2 - idx1;
+
+  // 🔥 AJUSTE DE DIREÇÃO INTELIGENTE
+  if (diferenca > 6) {
+    // intervalo deveria descer
+    midiAlvo -= 12;
+  } else if (diferenca < -6) {
+    // intervalo deveria subir
+    midiAlvo += 12;
+  }
+
+  const n1 = Tone.Frequency(midiBase, "midi");
+  const n2 = Tone.Frequency(midiAlvo, "midi");
 
   synth.triggerAttackRelease(n1, "16n");
+
   setTimeout(() => {
     synth.triggerAttackRelease(n2, "16n");
   }, 300);
 }
-
 // =======================
 // 🧠 LÓGICA
 // =======================
