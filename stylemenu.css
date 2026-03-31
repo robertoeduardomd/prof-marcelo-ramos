@@ -10,9 +10,10 @@ body {
 
     /* FUNDO MUSICAL */
     background-image: url("imgs/fundomusicaltonspasteis.png");
+    background-clip: ;
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
+    background-attachment: fixed;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -29,17 +30,19 @@ body {
 
 /* CARD */
 .card {
-    width: 100%;
-    max-width: 900px;
-    background: rgba(255, 255, 255, 0.85);
+    width: 80%;
+
+
     border-radius: 20px;
     padding: 32px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.973);
+    background: rgba(255, 255, 255, 0.85);
 
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     flex-direction: column;
     gap: 20px;
-    backdrop-filter: blur(10);
 }
 
 /* BOTÃO PIX (VARIAÇÃO) */
@@ -53,6 +56,9 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 30px;
+    background: rgb(255, 255, 255);
+    backdrop-filter: blur(10);
+    padding: 20px;
 }
 
 /* TEXTO */
@@ -81,20 +87,44 @@ body {
 
 .foto img {
     width: 100%;
-    max-width: 250px;
-    border-radius: 16px;
-}
+    max-width: 380px;
+    min-height: 5auto;
+    border-radius: 40px;
+    box-shadow: 0 0 24px rgb(0, 38, 255);
 
+    object-fit: contain;
+}
+.depoimentos{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;  
+}
+.depoimento-card{
+    display:flex;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 10px;
+    border-radius: 14px;
+}
+.video-wrapper{
+    display: flex;
+    justify-content: center;
+}
 /* BOTÕES */
 .apps {
+    width: 100%;
     margin-top: 20px;
     display: flex;
     gap: 20px;
 }
 
+.apps .btn {
+    width: 100%;
+}
+
 /* BOTÃO GRANDE */
 .btn,
 button {
+    width: 100%;
     flex: 1;
     text-align: center;
     padding: 20px;
@@ -305,6 +335,69 @@ footer h4 {
     background: #11ad03ab;
 }
 
+/* ANIMAÇÃO PARA BOTÃO INTERVALOS */
+.btn-intervalos {
+    position: relative;
+    overflow: hidden;      
+}
+
+.btn-intervalos .silaba {
+    display: inline-block;
+    opacity: 0;
+    animation: animarSilabas 4s infinite;
+    margin-right: 5px;
+}
+
+.btn-intervalos .silaba:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.btn-intervalos .silaba:nth-child(2) {
+    animation-delay: 0.8s;
+}
+
+.btn-intervalos .silaba:nth-child(3) {
+    animation-delay: 1.6s;
+}
+
+.btn-intervalos .silaba:nth-child(4) {
+    animation-delay: 2.4s;
+}
+@keyframes juntarsilabas {
+    0% {
+        margin-right: 5px;
+    }
+    100% {
+        margin-right: 0px;
+    }
+}
+@keyframes animarSilabas {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    80% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    90% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
 /* RESPONSIVO */
 @media (max-width: 768px) {
     .perfil {
@@ -319,8 +412,14 @@ footer h4 {
     .foto {
         order: -1;
     }
+    .depoimentos{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;  
 }
-.devpor{
+}
+
+.devpor {
     width: 100%;
     min-height: 40px;
     flex-direction: row;
@@ -329,6 +428,7 @@ footer h4 {
     align-items: center;
     justify-content: center;
 }
+
 .redudu {
     color: orange;
     transition: 0.3s;
@@ -336,4 +436,8 @@ footer h4 {
 
 .redudu:hover {
     font-size: 16px;
+}
+
+.apoio-texto {
+    display: flex;
 }
