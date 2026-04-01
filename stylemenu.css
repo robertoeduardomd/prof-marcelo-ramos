@@ -21,7 +21,7 @@ body {
 
     /* FUNDO MUSICAL */
     background-image: url("imgs/fundomusicaltonspasteis.png");
-    background-clip: ;
+    
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -33,6 +33,7 @@ body {
 /* CENTRALIZA NA TELA */
 .wrapper {
     min-height: 100vh;
+   
     display: flex;
     align-items: center;
     justify-content: center;
@@ -445,7 +446,18 @@ footer h4 {
 }
 
 /* RESPONSIVO */
-@media (max-width: 768px) {
+@media (max-width: 868px) {
+    
+.apoio-texto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+   .card {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.507);
+    }
     p{
         font-size: 12px;
     }
@@ -490,4 +502,5 @@ footer h4 {
 
 .apoio-texto {
     display: flex;
+    flex-direction: row;
 }
