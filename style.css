@@ -18,7 +18,7 @@ body {
 .card a {
   color: white;
   text-decoration: none;
-  padding: 10px;
+  padding: 1px;
   border-radius: 20px;
   transition: 0.3s;
   border-bottom: 1px solid #22c55e;
@@ -139,22 +139,29 @@ select option {
 
   padding-bottom: 40px;
   gap: calc(20px);
+  font-size: 22px;
 }
 
 /* LABEL vira botão */
 .opcao {
-  background: #334155;
-  width: 60px;
-  height: 60px;
-  border-radius: 10px;
+  background: #ffffff;
+  width: 80px;
+  height: 80px;
+   border-radius: 32px;
   text-align: center;
   cursor: pointer;
   transition: 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-}
+  color:#002f70;
+  font-weight: bolder;
 
+}
+.opcao2{
+  background: black;
+  color:white;
+}
 /* esconder radio */
 .opcao input {
   display: none;
@@ -162,12 +169,14 @@ select option {
 
 /* efeito hover */
 .opcao:hover {
-  background: #475569;
+  background: #00419c;
+  color:white;
 }
 
 /* selecionado */
 .opcao input:checked+span {
-  background: #c59a22;
+  background: #300131;
+  color:white;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -183,7 +192,7 @@ button {
   padding: 14px;
   border-radius: 10px;
   border: none;
-  font-size: 16px;
+  font-size: 20px;
   margin-top: 10px;
   cursor: pointer;
   background: #010238;

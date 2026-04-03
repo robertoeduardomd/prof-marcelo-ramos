@@ -67,7 +67,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 30px;
+    width: 100%;
     background: rgb(255, 255, 255);
     backdrop-filter: blur(10);
     padding: 20px;
@@ -76,6 +76,7 @@ body {
 /* TEXTO */
 .texto {
     flex: 1;
+    margin-right: 30px;
 }
 
 .texto h1 {
@@ -93,6 +94,7 @@ body {
 
 /* FOTO */
 .foto {
+    
     flex: 1;
     display: flex;
     justify-content: center;
@@ -448,7 +450,9 @@ footer h4 {
 
 /* RESPONSIVO */
 @media (max-width: 868px) {
-    
+    .texto{
+         margin-right: 30px;
+    }
 .apoio-texto {
     display: flex;
     align-items: center;

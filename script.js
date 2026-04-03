@@ -96,10 +96,10 @@ function criarSynth() {
   }).toDestination();
 
   if (instrumento.includes("baixo")) {
-    synth = new Tone.MonoSynth({ 
+    synth = new Tone.MonoSynth({
       oscillator: { type: "square" },
       envelope: { attack: 0.05, decay: 0.2, sustain: 0.4, release: 0.8 },
-      filter: { Q: 2, type: "lowpass", rolloff: -24 }
+      filter: { Q: 2, type: "lowpass", rolloff: -24 },
     });
     synth.volume.value = 3;
   } else if (instrumento.includes("guitarra")) {
@@ -133,8 +133,6 @@ const oitavasPorCorda = {
   bandolim4: [3, 3, 4, 4],
   bandolim5: [3, 3, 3, 4, 4],
 };
-
-
 
 // 🔥 AGORA AO CLICAR NA OPÇÃO
 function tocarSom(nota) {
@@ -244,6 +242,11 @@ function criarOpcoes() {
       const label = document.createElement("label");
       label.className = "opcao";
 
+      // Adiciona classe opcao2 para sustenidos/bemois
+      if (nota.includes("/")) {
+        label.classList.add("opcao2");
+      }
+
       const input = document.createElement("input");
       input.type = "radio";
       input.name = "nota";
@@ -285,7 +288,9 @@ function iniciarTimer() {
   intervalo = setInterval(() => {
     tempo++;
     // AJUSTE: Formatação para MM:SS
-    const min = Math.floor(tempo / 60).toString().padStart(2, "0");
+    const min = Math.floor(tempo / 60)
+      .toString()
+      .padStart(2, "0");
     const seg = (tempo % 60).toString().padStart(2, "0");
     timerEl.innerText = `Tempo: ${min}:${seg}`;
   }, 1000);
@@ -310,7 +315,6 @@ function mostrarToast(msg, tipo) {
 // =======================
 
 function finalizarJogo() {
-  
   clearInterval(intervalo);
 
   liberarScroll();
@@ -330,22 +334,18 @@ function finalizarJogo() {
 
   perguntaEl.innerText = "🎉 Finalizado!";
 
+  resultadoFinalEl.innerText = textoFinal;
+  resultadoFinalEl.style.display = "block";
 
-resultadoFinalEl.innerText = textoFinal;
-resultadoFinalEl.style.display = "block";
-
-
-resultadoFinalEl.classList.add("resultado-erro");
+  resultadoFinalEl.classList.add("resultado-erro");
 
   configEl.style.display = "flex";
-  
 
   btnIniciar.style.display = "block";
   btnIniciar.innerText = "Reiniciar";
 
   jogoIniciado = false;
 }
-
 
 // =======================
 // ✅ RESPOSTA
@@ -406,8 +406,8 @@ function iniciarJogo() {
   perguntaEl.style.display = "block";
 
   resultadoFinalEl.style.display = "none";
-resultadoFinalEl.classList.remove("resultado-erro");
-resultadoFinalEl.innerText = "";
+  resultadoFinalEl.classList.remove("resultado-erro");
+  resultadoFinalEl.innerText = "";
 
   gerarListaPerguntas();
   gerarPergunta();
