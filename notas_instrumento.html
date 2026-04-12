@@ -3,34 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <meta
-    name="description"
-    content="Treine notas no braço de guitarra, baixo, cavaquinho e bandolim de forma interativa. Ideal para iniciantes e estudantes de música."
-  />
-  <meta
-    name="keywords"
-    content="notas musicais, guitarra, baixo, cavaquinho, bandolim, treino musical, teoria musical, braço do instrumento"
-  />
-  <meta name="author" content="Professor Marcelo Ramos" />
+    <meta
+      name="description"
+      content="Treine notas no braço de guitarra, baixo, cavaquinho e bandolim de forma interativa. Ideal para iniciantes e estudantes de música."
+    />
+    <meta
+      name="keywords"
+      content="notas musicais, guitarra, baixo, cavaquinho, bandolim, treino musical, teoria musical, braço do instrumento"
+    />
+    <meta name="author" content="Professor Marcelo Ramos" />
 
-  <!-- 🔥 OPEN GRAPH (WhatsApp, Facebook, etc) -->
-  <meta property="og:title" content="Treino de Notas Musicais 🎸" />
-  <meta
-    property="og:description"
-    content="Aprenda as notas no braço dos instrumentos de forma prática e interativa!"
-  />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://prof-marcelo-ramos.vercel.app/" />
-  <meta property="og:image" content="https://prof-marcelo-ramos.vercel.app/imgs/appnocelular.jpg" />
+    <!-- 🔥 OPEN GRAPH (WhatsApp, Facebook, etc) -->
+    <meta property="og:title" content="Treino de Notas Musicais 🎸" />
+    <meta
+      property="og:description"
+      content="Aprenda as notas no braço dos instrumentos de forma prática e interativa!"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://prof-marcelo-ramos.vercel.app/" />
+    <meta
+      property="og:image"
+      content="https://prof-marcelo-ramos.vercel.app/imgs/appnocelular.jpg"
+    />
 
-  <!-- 🔥 TWITTER -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Treino de Notas Musicais 🎸" />
-  <meta
-    name="twitter:description"
-    content="Treine notas no braço de instrumentos de forma interativa!"
-  />
-  <meta name="twitter:image" content="https://seusite.com/imgs/appnocelular.jpg" />
+    <!-- 🔥 TWITTER -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Treino de Notas Musicais 🎸" />
+    <meta
+      name="twitter:description"
+      content="Treine notas no braço de instrumentos de forma interativa!"
+    />
+    <meta
+      name="twitter:image"
+      content="https://seusite.com/imgs/appnocelular.jpg"
+    />
     <title>Treino de Notas Professor Marcelo</title>
     <link rel="stylesheet" href="style.css" />
     <link
@@ -50,23 +56,24 @@
         <br />
         <!-- NOVO: seletor de instrumento -->
         <div class="ldld">
-         <select id="instrumento">
-  <option value="guitarra">Guitarra/Violão (6 cordas)</option>
-  <option value="baixo4">Baixo (4 cordas)</option>
-  <option value="baixo5">Baixo (5 cordas)</option>
-  <option value="cavaquinho">Cavaquinho (4 cordas)</option>
-  <option value="bandolim4">Bandolim (4 cordas)</option>
-  <option value="bandolim5">Bandolim (5 cordas) </option>
-</select>
+          <select id="instrumento">
+            <option value="guitarra">Guitarra/Violão (6 cordas)</option>
+            <option value="violao7">Violão 7 cordas (B-E-A-D-G-B-E)</option>
+            <option value="baixo4">Baixo (4 cordas)</option>
+            <option value="baixo5">Baixo (5 cordas)</option>
+            <option value="cavaquinho">Cavaquinho (4 cordas)</option>
+            <option value="bandolim4">Bandolim (4 cordas)</option>
+            <option value="bandolim5">Bandolim (5 cordas)</option>
+          </select>
           <select id="posicao">
             <option value="1">Posição 1 (0–4 casa)</option>
             <option value="2">Posição 2 (5–8 casa)</option>
             <option value="3">Posição 3 (9–12 casa)</option>
-             <option value="1-2">Posição 1–2 (0–8 casa)</option>
-  <option value="2-3">Posição 2–3 (5–12 casa)</option>
-  <option value="todas">Todas (0–12)</option>
+            <option value="1-2">Posição 1–2 (0–8 casa)</option>
+            <option value="2-3">Posição 2–3 (5–12 casa)</option>
+            <option value="todas">Todas (0–12)</option>
           </select>
-          
+
           <button id="btnAjuda" class="btn-ajuda-inline">?</button>
         </div>
         <button id="btnIniciar">Iniciar</button>
@@ -78,25 +85,23 @@
         <br />
         <p id="resultado"></p>
         <div id="opcoes" class="opcoes"></div>
-
-       
       </div>
     </div>
     <div class="apoio">
-  <p class="apoio-texto">
-    🎵 Gostou do treino?
-    <br />
-    
-    <br />
-    Apoie meu trabalho com doaçao de R$10 no pix❤️
-  </p>
+      <p class="apoio-texto">
+        🎵 Gostou do treino?
+        <br />
 
-  <button class="btnpix" onclick="copiarPix()">Copiar chave PIX</button>
-</div>
-<div id="modalAjuda" class="modal-ajuda">
-  <button id="fecharModal" class="fechar-modal"><p>✕</p></button>
-  <img id="imagemInstrumento" src="" />
-</div>
+        <br />
+        Apoie meu trabalho com doaçao de R$10 no pix❤️
+      </p>
+
+      <button class="btnpix" onclick="copiarPix()">Copiar chave PIX</button>
+    </div>
+    <div id="modalAjuda" class="modal-ajuda">
+      <button id="fecharModal" class="fechar-modal"><p>✕</p></button>
+      <img id="imagemInstrumento" src="" />
+    </div>
     <script src="https://unpkg.com/tone"></script>
     <script src="script.js"></script>
     <footer>

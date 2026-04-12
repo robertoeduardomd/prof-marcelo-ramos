@@ -4,6 +4,7 @@
 
 const instrumentos = {
   guitarra: ["E", "A", "D", "G", "B", "E"],
+  violao7: ["B", "E", "A", "D", "G", "B", "E"],
 
   baixo4: ["E", "A", "D", "G"],
   baixo5: ["B", "E", "A", "D", "G"],
@@ -102,7 +103,10 @@ function criarSynth() {
       filter: { Q: 2, type: "lowpass", rolloff: -24 },
     });
     synth.volume.value = 3;
-  } else if (instrumento.includes("guitarra")) {
+  } else if (
+    instrumento.includes("guitarra") ||
+    instrumento.includes("violao")
+  ) {
     synth = new Tone.MonoSynth({ oscillator: { type: "sawtooth" } });
     synth.volume.value = -5;
   } else {
@@ -127,6 +131,7 @@ function mapearNota(nota) {
 // 🔥 NOVO: oitavas reais por instrumento
 const oitavasPorCorda = {
   guitarra: [2, 2, 3, 3, 3, 4], // corda 6 → 1
+  violao7: [1, 2, 2, 3, 3, 3, 4], // corda 7 → 1
   baixo4: [1, 1, 2, 2],
   baixo5: [0, 1, 1, 2, 2],
   cavaquinho: [4, 4, 4, 4],
@@ -460,6 +465,7 @@ const imgInstrumento = document.getElementById("imagemInstrumento");
 // 🔥 MAPEAMENTO DAS IMAGENS
 const imagens = {
   guitarra: "../imgs/guitarra.jpg",
+  violao7: "../imgs/violao7.jpg",
   baixo4: "../imgs/baixo4.jpg",
   baixo5: "../imgs/baixo5.jpg",
   cavaquinho: "../imgs/cavaquinho.png",
