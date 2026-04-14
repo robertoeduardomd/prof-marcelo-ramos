@@ -10,7 +10,7 @@ const notas = [
   ["D##", "E", "Fb"],
   ["E#", "F", "Gbb"],
   ["F#", "Gb"],
-  ["F##",  "G", "Abb"],
+  ["F##", "G", "Abb"],
   ["G#", "Ab"],
   ["G##", "A", "Bbb"],
   ["A#", "Bb"],
@@ -84,9 +84,12 @@ function criarSynth() {
   synth.connect(reverb);
 }
 
-document.body.addEventListener("click", async () => {
+document.body.addEventListener(
+  "click",
+  async () => {
     await Tone.start();
-  }, { once: true }
+  },
+  { once: true },
 );
 
 function tocarIntervalo(nota1, nota2) {
@@ -146,14 +149,29 @@ function gerarListaPerguntas() {
 
   if (modo === "intervalo") {
     const intEscolhido = selectIntervalo.value;
-    const bases = ["C", "C#", "Db", "D", "Eb", "E", "F", "F#", "Gb", "G", "Ab", "A", "Bb", "B"];
+    const bases = [
+      "C",
+      "C#",
+      "Db",
+      "D",
+      "Eb",
+      "E",
+      "F",
+      "F#",
+      "Gb",
+      "G",
+      "Ab",
+      "A",
+      "Bb",
+      "B",
+    ];
     bases.forEach((base) => {
       const novoIndex = (mapaNotas[base] + intervalos[intEscolhido]) % 12;
       const correta = escolherNotaCorreta(base, intEscolhido, notas[novoIndex]);
       perguntas.push({
         texto: `${formatarIntervalo(intEscolhido)} de ${base}`,
         base,
-        resposta: correta
+        resposta: correta,
       });
     });
   } else {
@@ -164,7 +182,7 @@ function gerarListaPerguntas() {
       perguntas.push({
         texto: `${formatarIntervalo(intKey)} de ${base}`,
         base,
-        resposta: correta
+        resposta: correta,
       });
     });
   }
@@ -173,10 +191,21 @@ function gerarListaPerguntas() {
 
 function formatarIntervalo(i) {
   const nomes = {
-    "2m": "2ª m", "2M": "2ª M", "3m": "3ª m", "3M": "3ª M",
-    "4J": "4ª J", "4A": "4ª Aum.", "5d": "5ª dim", "5J": "5ª J",
-    "5A": "5ª Aum.", "6m": "6ª m", "6M": "6ª M", "7d": "7ª dim",
-    "7m": "7ª m", "7M": "7ª M", "9A": "9ª Aum."
+    "2m": "2ª m",
+    "2M": "2ª M",
+    "3m": "3ª m",
+    "3M": "3ª M",
+    "4J": "4ª J",
+    "4A": "4ª Aum.",
+    "5d": "5ª dim",
+    "5J": "5ª J",
+    "5A": "5ª Aum.",
+    "6m": "6ª m",
+    "6M": "6ª M",
+    "7d": "7ª dim",
+    "7m": "7ª m",
+    "7M": "7ª M",
+    "9A": "9ª Aum.",
   };
   return nomes[i] || i;
 }
@@ -193,12 +222,12 @@ function gerarPergunta() {
 
 function criarOpcoes() {
   opcoesEl.innerHTML = "";
-  
+
   // Agora ambos os modos usam a mesma visualização de botões agrupados
   notas.forEach((grupo) => {
     const btn = document.createElement("div");
     btn.className = "opcao";
-    
+
     // Adiciona classe opcao2 se o grupo tiver exatamente 2 notas (C#/Db, etc)
     if (grupo.length === 2) {
       btn.classList.add("opcao2");
@@ -213,15 +242,15 @@ function criarOpcoes() {
       btn.appendChild(span);
     });
 
-   // Dentro da função criarOpcoes(), substitua o bloco do btn.onclick por:
-btn.addEventListener("pointerdown", (e) => {
-    e.preventDefault(); // Evita comportamentos estranhos no mobile
-    if (!jogoIniciado || bloqueado) return;
-    
-    // Identifica se o grupo clicado contém a resposta correta
-    const correto = grupo.includes(perguntaAtual.resposta);
-    responder(correto);
-});
+    // Dentro da função criarOpcoes(), substitua o bloco do btn.onclick por:
+    btn.addEventListener("pointerdown", (e) => {
+      e.preventDefault(); // Evita comportamentos estranhos no mobile
+      if (!jogoIniciado || bloqueado) return;
+
+      // Identifica se o grupo clicado contém a resposta correta
+      const correto = grupo.includes(perguntaAtual.resposta);
+      responder(correto);
+    });
     opcoesEl.appendChild(btn);
   });
 }
@@ -234,7 +263,10 @@ function responder(correto) {
     mostrarToast("✅ Correto!", "sucesso");
   } else {
     erros++;
-    mostrarToast(`❌ Correto: ${formatarExibicaoNota(perguntaAtual.resposta)}`, "erro");
+    mostrarToast(
+      `❌ Correto: ${formatarExibicaoNota(perguntaAtual.resposta)}`,
+      "erro",
+    );
   }
   atualizarPlacar();
   indiceAtual++;
@@ -268,7 +300,11 @@ function iniciarTimer() {
   tempo = 0;
   intervaloTimer = setInterval(() => {
     tempo++;
-    timerEl.innerText = `Tempo: ${tempo}s`;
+    const minutos = Math.floor(tempo / 60);
+    const segundos = tempo % 60;
+    const minutosFormatados = minutos.toString().padStart(2, "0");
+    const segundosFormatados = segundos.toString().padStart(2, "0");
+    timerEl.innerText = `${minutosFormatados}:${segundosFormatados}`;
   }, 1000);
 }
 
@@ -281,7 +317,10 @@ function mostrarToast(msg, tipo) {
 function iniciarJogo() {
   jogoIniciado = true;
   configEl.style.display = "none";
-  acertos = 0; erros = 0; total = 0; indiceAtual = 0;
+  acertos = 0;
+  erros = 0;
+  total = 0;
+  indiceAtual = 0;
   gerarListaPerguntas();
   atualizarPlacar();
   iniciarTimer();
@@ -299,7 +338,8 @@ document.querySelectorAll("input[name='modo']").forEach((r) => {
 });
 
 selectNota.addEventListener("change", () => {
-    if (document.querySelector("input[name='modo']:checked").value === "nota") criarOpcoes();
+  if (document.querySelector("input[name='modo']:checked").value === "nota")
+    criarOpcoes();
 });
 
 btnIniciar.addEventListener("click", iniciarJogo);

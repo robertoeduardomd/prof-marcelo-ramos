@@ -297,7 +297,7 @@ function iniciarTimer() {
       .toString()
       .padStart(2, "0");
     const seg = (tempo % 60).toString().padStart(2, "0");
-    timerEl.innerText = `Tempo: ${min}:${seg}`;
+    timerEl.innerText = `${min}:${seg}`;
   }, 1000);
 }
 
