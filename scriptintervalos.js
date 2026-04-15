@@ -73,6 +73,8 @@ let jogoIniciado = false;
 let tempo = 0;
 let intervaloTimer;
 let synth;
+let synthErro;
+let notaAtual = null;
 
 // =======================
 // 🔊 AUDIO
@@ -82,6 +84,19 @@ function criarSynth() {
   const reverb = new Tone.Reverb({ decay: 1, wet: 0.5 }).toDestination();
   synth = new Tone.Synth();
   synth.connect(reverb);
+
+  // Synth para som de erro tipo "peeeeem"
+  synthErro = new Tone.Synth({
+    oscillator: {
+      type: "sawtooth",
+    },
+    envelope: {
+      attack: 0.01,
+      decay: 0.3,
+      sustain: 0.2,
+      release: 0.5,
+    },
+  }).toDestination();
 }
 
 document.body.addEventListener(
@@ -92,36 +107,62 @@ document.body.addEventListener(
   { once: true },
 );
 
+function calcularOitavaMaisProxima(notaBase, notaAlvo) {
+  const idxBase = mapaNotas[notaBase];
+  const idxAlvo = mapaNotas[notaAlvo];
+
+  let midiBase = 60 + idxBase;
+  let midiAlvo = 60 + idxAlvo;
+
+  // Calcula diferença real
+  let diferenca = idxAlvo - idxBase;
+
+  // Ajuste inteligente de oitava - escolhe a direção mais próxima
+  if (diferenca > 6) {
+    // intervalo deveria descer (oitava abaixo)
+    midiAlvo -= 12;
+  } else if (diferenca < -6) {
+    // intervalo deveria subir (oitava acima)
+    midiAlvo += 12;
+  }
+
+  return { midiBase, midiAlvo };
+}
+
+function tocarNota(nota, duracao = "16n") {
+  if (!synth) return;
+
+  const idx = mapaNotas[nota];
+  const midi = 60 + idx;
+  const frequencia = Tone.Frequency(midi, "midi");
+
+  synth.triggerAttackRelease(frequencia, duracao);
+}
+
 function tocarIntervalo(nota1, nota2) {
   if (!synth) return;
 
-  const idx1 = mapaNotas[nota1];
-  const idx2 = mapaNotas[nota2];
-
-  let midiBase = 60 + idx1;
-  let midiAlvo = 60 + idx2;
-
-  // 🔥 calcula distância real
-  let diferenca = idx2 - idx1;
-
-  // 🔥 AJUSTE DE DIREÇÃO INTELIGENTE
-  if (diferenca > 6) {
-    // intervalo deveria descer
-    midiAlvo -= 12;
-  } else if (diferenca < -6) {
-    // intervalo deveria subir
-    midiAlvo += 12;
-  }
+  const { midiBase, midiAlvo } = calcularOitavaMaisProxima(nota1, nota2);
 
   const n1 = Tone.Frequency(midiBase, "midi");
   const n2 = Tone.Frequency(midiAlvo, "midi");
 
+  // Toca nota base primeiro
   synth.triggerAttackRelease(n1, "16n");
 
+  // Depois toca a segunda nota
   setTimeout(() => {
     synth.triggerAttackRelease(n2, "16n");
   }, 300);
 }
+
+function tocarSomErro() {
+  if (!synthErro) return;
+
+  // Som de erro tipo "peeeeem" - nota grave com sustain
+  synthErro.triggerAttackRelease("C2", "8n");
+}
+
 // =======================
 // 🧠 LÓGICA
 // =======================
@@ -217,7 +258,9 @@ function gerarPergunta() {
   }
   perguntaAtual = perguntas[indiceAtual];
   perguntaEl.innerText = perguntaAtual.texto;
-  tocarIntervalo(perguntaAtual.base, perguntaAtual.resposta);
+
+  // Toca APENAS a nota base da pergunta
+  tocarNota(perguntaAtual.base);
 }
 
 function criarOpcoes() {
@@ -244,36 +287,62 @@ function criarOpcoes() {
 
     // Dentro da função criarOpcoes(), substitua o bloco do btn.onclick por:
     btn.addEventListener("pointerdown", (e) => {
-      e.preventDefault(); // Evita comportamentos estranhos no mobile
+      e.preventDefault();
       if (!jogoIniciado || bloqueado) return;
 
       // Identifica se o grupo clicado contém a resposta correta
       const correto = grupo.includes(perguntaAtual.resposta);
-      responder(correto);
+
+      // Toca a nota clicada (primeira nota do grupo)
+      if (grupo.length > 0) {
+        tocarNota(grupo[0]);
+      }
+
+      // Pequena pausa antes de processar a resposta
+      setTimeout(() => {
+        responder(correto, grupo.length > 0 ? grupo[0] : null);
+      }, 200);
     });
     opcoesEl.appendChild(btn);
   });
 }
 
-function responder(correto) {
+function responder(correto, notaClicada = null) {
   bloqueado = true;
   total++;
+
   if (correto) {
     acertos++;
     mostrarToast("✅ Correto!", "sucesso");
+
+    // Toca a nota correta com a nota base para reforçar
+    if (notaClicada) {
+      setTimeout(() => {
+        tocarIntervalo(perguntaAtual.base, notaClicada);
+      }, 500);
+    }
   } else {
     erros++;
     mostrarToast(
       `❌ Correto: ${formatarExibicaoNota(perguntaAtual.resposta)}`,
       "erro",
     );
+
+    // Toca som de erro
+    tocarSomErro();
+
+    // Mostra o intervalo correto tocando as notas
+    setTimeout(() => {
+      tocarIntervalo(perguntaAtual.base, perguntaAtual.resposta);
+    }, 300);
   }
+
   atualizarPlacar();
   indiceAtual++;
   setTimeout(() => {
     bloqueado = false;
     gerarPergunta();
-  }, 400);
+  }, 2000); // Aumentado para dar tempo de ouvir o intervalo completo
 }
 
 function embaralhar(array) {
