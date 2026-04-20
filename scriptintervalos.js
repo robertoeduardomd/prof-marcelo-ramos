@@ -298,10 +298,8 @@ function criarOpcoes() {
         tocarNota(grupo[0]);
       }
 
-      // Pequena pausa antes de processar a resposta
-      setTimeout(() => {
-        responder(correto, grupo.length > 0 ? grupo[0] : null);
-      }, 200);
+      // Processa resposta imediatamente
+      responder(correto, grupo.length > 0 ? grupo[0] : null);
     });
     opcoesEl.appendChild(btn);
   });
@@ -314,13 +312,6 @@ function responder(correto, notaClicada = null) {
   if (correto) {
     acertos++;
     mostrarToast("✅ Correto!", "sucesso");
-
-    // Toca a nota correta com a nota base para reforçar
-    if (notaClicada) {
-      setTimeout(() => {
-        tocarIntervalo(perguntaAtual.base, notaClicada);
-      }, 500);
-    }
   } else {
     erros++;
     mostrarToast(
@@ -328,21 +319,18 @@ function responder(correto, notaClicada = null) {
       "erro",
     );
 
-    // Toca som de erro
+    // Toca som de erro apenas
     tocarSomErro();
-
-    // Mostra o intervalo correto tocando as notas
-    setTimeout(() => {
-      tocarIntervalo(perguntaAtual.base, perguntaAtual.resposta);
-    }, 300);
   }
 
   atualizarPlacar();
   indiceAtual++;
+
+  // Passa para próxima pergunta imediatamente
   setTimeout(() => {
     bloqueado = false;
     gerarPergunta();
-  }, 2000); // Aumentado para dar tempo de ouvir o intervalo completo
+  }, 400); // Tempo reduzido para jogo rápido
 }
 
 function embaralhar(array) {
