@@ -7,6 +7,20 @@
     <link rel="stylesheet" href="styleintervalos.css" />
   </head>
   <body>
+    <div class="user-info" style="display: flex; gap: 15px; align-items: center;">
+        <div>
+          <span id="nome-usuario">Carregando...</span>
+          <br>
+          <span id="plano-usuario">Carregando...</span>
+        </div>
+
+        <a id="linkindex" href="index.html" style="color: white; text-decoration: none;">Prof Marcelo Ramos</a>
+        <a id="linknotas" href="notas_instrumento.html" style="color: white; text-decoration: none;">App Notas</a>
+        <a id="linkpainel" href="painel.html" style="color: white; text-decoration: none; display: none;">Histórico</a>
+        
+        <button id="btn-login-logout" style="cursor: pointer; border: none; border-radius: 5px; padding: 8px 15px; font-weight: bold;">Fazer Login</button>
+      </div>
+
     <div class="container">
       <div class="card">
         <h2>Treino de Intervalos🎵</h2>
@@ -76,6 +90,75 @@
       </div>
     </div>
 
+    <div id="modal-planos" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:11000; justify-content:center; align-items:center; font-family: sans-serif; backdrop-filter: blur(5px);">
+        <div style="background:#1e293b; padding:40px; border-radius:20px; width:90%; max-width:500px; color:white; text-align:center; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+            
+            <div style="font-size: 50px; margin-bottom: 10px;">🎸</div>
+            <h2 style="margin-bottom: 10px; color: #f8fafc;">Limite Atingido!</h2>
+            <p style="color: #94a3b8; margin-bottom: 30px;">Você completou suas 3 jogadas gratuitas. Escolha um plano para continuar evoluindo seu ouvido e sua técnica.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                
+                <div onclick="window.location.href='checkout.html?plan=individual'" style="background: #334155; padding: 20px; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.3s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='transparent'">
+                    <h3 style="margin: 0; font-size: 18px;">Plano Mestre das Notas</h3>
+                    <p style="margin: 5px 0 0; color: #60a5fa; font-weight: bold;">R$ 29,90 / ano</p>
+                    <small style="color: #94a3b8;">Acesso ilimitado apenas a este app</small>
+                </div>
+
+                <div onclick="window.location.href='checkout.html?plan=combo'" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); padding: 20px; border-radius: 12px; cursor: pointer; transform: scale(1.05); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);">
+                    <span style="background: #facc15; color: #000; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase;">Melhor Oferta</span>
+                    <h3 style="margin: 5px 0 0; font-size: 18px;">Combo Multi-Instrumentista</h3>
+                    <p style="margin: 5px 0 0; color: #fff; font-weight: bold;">R$ 49,90 / ano</p>
+                    <small style="color: #d1d5db;">Notas + Intervalos + Todos os novos apps</small>
+                </div>
+
+            </div>
+
+            <button onclick="document.getElementById('modal-planos').style.display='none'" style="margin-top: 25px; background: none; border: none; color: #64748b; cursor: pointer; text-decoration: underline;">Voltar ao início</button>
+        </div>
+    </div>
+
+    <div id="modal-auth" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; font-family: sans-serif;">
+        <div style="background:#1e293b; padding:30px; border-radius:15px; width:90%; max-width:400px; color:white; position:relative;">
+            <button onclick="fecharModais()" style="position:absolute; top:10px; right:15px; background:none; border:none; color:gray; cursor:pointer; font-size:20px;">&times;</button>
+            
+            <h2 id="auth-titulo" style="text-align:center; margin-top: 20px;">Entrar no Sistema</h2>
+            
+            <div id="auth-campos" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
+                <input type="text" id="auth-nome" placeholder="Seu Nome (para cadastro)" style="padding:12px; border-radius:5px; border:none; display:none;">
+                <input type="email" id="auth-email" placeholder="Seu melhor e-mail" style="padding:12px; border-radius:5px; border:none;">
+                <input type="password" id="auth-senha" placeholder="Sua senha (mín. 6 caracteres)" style="padding:12px; border-radius:5px; border:none;">
+                
+                <button onclick="InterfaceUsuario.processarAuth()" style="padding:12px; border-radius:5px; border:none; background:#3b82f6; color:white; font-weight:bold; cursor:pointer;">Continuar</button>
+            </div>
+            <a href="#" onclick="abrirModalRecuperacao()" style="font-size: 12px; color: #94a3b8;">Esqueceu sua senha?</a>
+            <p style="text-align:center; font-size:12px; margin-top:15px; color:#94a3b8;">
+                <span id="auth-texto-alternar">Não tem conta?</span> <a href="#" onclick="InterfaceUsuario.alternarModoAuth()" id="auth-link" style="color:#60a5fa;">Cadastre-se</a>
+            </p>
+        </div>
+    </div>
+    <div id="modal-esqueci" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <h2>Recuperar Acesso</h2>
+        <p>Digite seu e-mail para receber o link de redefinição.</p>
+        <input type="email" id="email-recuperacao" placeholder="seu-email@exemplo.com">
+        <div class="modal-btns">
+            <button onclick="fecharModal('modal-esqueci')" class="btn-cancelar">Cancelar</button>
+            <button onclick="processarRecuperacao()" class="btn-confirmar">Enviar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-resetar" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <h2>Nova Senha</h2>
+        <p>Escolha sua nova senha de segurança.</p>
+        <input type="password" id="nova-senha-input" placeholder="Nova senha">
+        <button onclick="trocarSenha()" class="btn-confirmar">Salvar Senha</button>
+    </div>
+</div>
+
+
     <script src="https://unpkg.com/tone"></script>
     <script src="scriptintervalos.js"></script>
     <footer>
@@ -84,5 +167,7 @@
         Roberto Eduardo</a
       >
     </footer>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
   </body>
 </html>

@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="dashboard.css">
+  
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="perfil">
+        <h2 id="nome-usuario">Carregando...</h2>
+        <p id="plano-usuario">Carregando plano...</p>
+      </div>
+      <button class="menu-btn" onclick="abrirConfiguracoes()">👤 Perfil</button
+      ><button class="menu-btn" onclick="abrirPagina('notas')">
+        🎵 Notas no Instrumento</button
+      ><button class="menu-btn" onclick="abrirPagina('intervalos')">
+        🎼 Intervalos
+      </button>
+      <div id="txt_adm" style="display: none; text-align: center">
+        Configurações de admin:
+      </div>
+      <button
+        class="menu-btn"
+        id="btn-admin"
+        style="display: none"
+        onclick="abrirUsuarios()"
+      >
+        👥Planos de Usuários</button
+      ><button
+        class="menu-btn"
+        id="btn-historico"
+        style="display: none"
+        onclick="abrirHistoricoUsuarios()"
+      >
+        📊 Histórico Usuários</button
+      ><button class="menu-btn sair" id="btn-sair">🚪 Sair</button>
+    </aside>
+    <main class="main" id="conteudo-principal">
+      <div class="titulo"><h1>Dashboard</h1></div>
+    </main>
+    <script>
+      const EMAIL_ADMIN = "marcelo@seusite.com";
+
+      let usuarioAtual = null;
+      let historicoGlobal = [];
+
+      // ======================================================
+      // LOAD
+      // ======================================================
+
+      window.onload = async () => {
+        const {
+          data: { session },
+        } = await supabaseClient.auth.getSession();
+
+        if (!session || !session.user) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        usuarioAtual = session.user;
+        console.log("USUARIO AUTH:", usuarioAtual);
+        console.log("ID:", usuarioAtual.id);
+        console.log("EMAIL:", usuarioAtual.email);
+        // ==================================================
+        // PEGA NOME REAL DA TABELA USERS
+        // ==================================================
+
+        const { data: userTable } = await supabaseClient
+          .from("users")
+          .select("nome, tipo_acesso, is_admin")
+          .eq("id", usuarioAtual.id)
+          .maybeSingle();
+        const nomeFinal =
+          userTable?.nome ||
+          usuarioAtual.user_metadata?.display_name ||
+          usuarioAtual.email.split("@")[0] ||
+          "Músico";
+
+        document.getElementById("nome-usuario").innerText = `Olá, ${nomeFinal}`;
+        const plano = userTable?.tipo_acesso || "free";
+
+        document.getElementById("plano-usuario").innerText = `Plano: ${plano}`;
+        // ==================================================
+        // ADMIN
+        // ==================================================
+
+        console.log("USER TABLE:", userTable);
+        console.log("IS ADMIN:", userTable?.is_admin);
+
+        if (userTable?.is_admin === true) {
+          document.getElementById("txt_adm").style.display = "block";
+          document.getElementById("btn-admin").style.display = "block";
+          document.getElementById("btn-historico").style.display = "block";
+        }
+
+        // ==================================================
+        // LOGOUT
+        // ==================================================
+
+        document.getElementById("btn-sair").onclick = async () => {
+          await supabaseClient.auth.signOut();
+
+          window.location.href = "index.html";
+        };
+
+        // ==================================================
+        // HISTÓRICO
+        // ==================================================
+
+        const { data, error } = await supabaseClient
+          .from("historico_jogadas")
+          .select("*")
+          .eq("identificador", usuarioAtual.id)
+          .order("created_at", {
+            ascending: false,
+          });
+
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        historicoGlobal = data || [];
+        console.log("HISTORICO:", historicoGlobal);
+
+        historicoGlobal.forEach((item) => {
+          console.log("APP DO BANCO:", item.app);
+        });
+        // abre tela inicial
+        abrirPagina("notas");
+      };
+
+      // ======================================================
+      // ABRIR PÁGINA
+      // ======================================================
+
+      function abrirPagina(nomeApp) {
+        const main = document.getElementById("conteudo-principal");
+
+        const dados = historicoGlobal.filter((item) => item.app === nomeApp);
+
+        let melhorTempo = null;
+
+        const nomesBonitos = {
+          notas: "Notas no Braço do Instrumento",
+          intervalos: "Intervalos",
+        };
+
+        const tituloBonito = nomesBonitos[nomeApp] || nomeApp;
+
+        dados.forEach((item) => {
+          if (
+            item.tempo_segundos &&
+            (melhorTempo === null || item.tempo_segundos < melhorTempo)
+          ) {
+            melhorTempo = item.tempo_segundos;
+          }
+        });
+
+        const ultimaJogada = dados[0];
+
+        main.innerHTML = `
+
+              <div class="titulo">
+                 <h1>${tituloBonito}</h1>
+              </div>
+
+              <div class="cards-topo">
+
+                  <div class="info-card">
+                      <span>🏆 Seu Melhor Tempo</span>
+                      <h2>
+                          ${formatarTempo(melhorTempo)}
+                      </h2>
+                  </div>
+
+                  <div class="info-card">
+                      <span>🎮 Partidas Jogadas</span>
+                      <h2>${dados.length}</h2>
+                  </div>
+
+                  <div class="info-card">
+                      <span>📅 Última Tentativa</span>
+                      <h2 style="font-size:20px;">
+                          ${
+                            ultimaJogada
+                              ? new Date(
+                                  ultimaJogada.created_at,
+                                ).toLocaleDateString("pt-BR")
+                              : "--"
+                          }
+                      </h2>
+                  </div>
+
+              </div>
+
+              <div class="historico-box">
+
+                  <div class="historico-topo">
+                      <h2>Histórico</h2>
+                  </div>
+
+                  ${
+                    dados.length === 0
+                      ? `
+                          <div class="vazio">
+                              Nenhuma partida encontrada.
+                          </div>
+                      `
+                      : `
+                          <table>
+
+                              <thead>
+                                  <tr>
+                                      <th>Data</th>
+                                      <th>Acertos</th>
+                                      <th>Erros</th>
+                                      <th>Tempo</th>
+                                  </tr>
+                              </thead>
+
+                              <tbody>
+
+                                 ${dados
+                                   .map((item) => {
+                                     // Verifica se o tempo desta linha é o mesmo que o melhor tempo salvo
+                                     const classeDestaque =
+                                       item.tempo_segundos === melhorTempo
+                                         ? 'class="linha-destaque"'
+                                         : "";
+
+                                     return `
+              <tr ${classeDestaque}>
+                  <td>${new Date(item.created_at).toLocaleDateString("pt-BR")}</td>
+                  <td>${item.acertos || 0}</td>
+                  <td>${item.erros || 0}</td>
+                  <td>${formatarTempo(item.tempo_segundos)}</td>
+              </tr>
+              `;
+                                   })
+                                   .join("")}
+
+                              </tbody>
+
+                          </table>
+                      `
+                  }
+
+              </div>
+              <br><br>
+               <div class="apps">
+                <a href="notas_instrumento.html" class="btn btnnotas"
+                  >🎸 Notas no braco do instrumento</a
+                >
+                <a href="intervalos.html" class="btn btn-intervalos"
+                  ><span class="silaba">🎵</span> <span class="silaba">in</span
+                  ><span class="silaba">ter</span><span class="silaba">valos</span></a
+                >
+              </div>
+          `;
+      }
+
+      // ======================================================
+      // USUÁRIOS ADMIN
+      // ======================================================
+      async function abrirHistoricoUsuarios() {
+        const main = document.getElementById("conteudo-principal");
+
+        const { data: usuarios, error: erroUsers } = await supabaseClient
+          .from("users")
+          .select("*");
+
+        const { data: historico, error: erroHistorico } = await supabaseClient
+          .from("historico_jogadas")
+          .select("*");
+
+        if (erroUsers || erroHistorico) {
+          console.error(erroUsers || erroHistorico);
+          return;
+        }
+
+        let html = ` <div class="titulo"><h1>📊 Histórico dos Usuários</h1></div><div class="historico-box"><table><thead><tr><th>Usuário</th><th>App</th><th>Partidas</th><th>Melhor Tempo</th><th>Acertos (no recorde)</th></tr></thead><tbody>`;
+
+        usuarios.forEach((user) => {
+          const jogosUsuario = historico.filter(
+            (h) => h.identificador === user.id,
+          );
+          const apps = [...new Set(jogosUsuario.map((j) => j.app))];
+
+          apps.forEach((app) => {
+            const jogosApp = jogosUsuario.filter((j) => j.app === app);
+
+            // Encontra a partida com o menor tempo (melhor tempo)
+            const melhorPartida = jogosApp.reduce((prev, curr) => {
+              return curr.tempo_segundos < prev.tempo_segundos ? curr : prev;
+            });
+
+            html += ` <tr>
+                              <td>${user.nome || "---"}</td>
+                              <td>${app}</td>
+                              <td>${jogosApp.length}</td>
+                              <td>${formatarTempo(melhorPartida.tempo_segundos)}</td>
+                              <td>${melhorPartida.acertos || 0}</td>
+                          </tr> `;
+          });
+        });
+
+        html += `</tbody></table></div>`;
+        main.innerHTML = html;
+      }
+
+      async function abrirUsuarios() {
+        const main = document.getElementById("conteudo-principal");
+
+        const { data, error } = await supabaseClient.from("users").select("*");
+
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        main.innerHTML = `
+
+        <div class="titulo">
+            <h1>Gerenciar Usuários</h1>
+        </div>
+
+        <div class="historico-box">
+
+            <table>
+
+               <thead>
+    <tr>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Plano</th>
+        <th>Pagamento</th>
+        <th>Pagamento confirmado em</th>
+        <th>Expira em</th>
+        <th>Salvar</th>
+    </tr>
+</thead>
+
+<tbody>
+
+    ${data
+      .map(
+        (user) => `
+
+        <tr>
+
+            <td>
+                ${user.nome || "---"}
+            </td>
+
+            <td>
+                ${user.email || "---"}
+            </td>
+
+            <td>
+
+                <select
+                    id="plano-${user.id}"
+                    style="
+                        padding:8px;
+                        border-radius:8px;
+                        background:#0f172a;
+                        color:white;
+                        border:1px solid #334155;
+                    "
+                >
+
+                    <option value="free"
+                        ${user.tipo_acesso === "free" ? "selected" : ""}
+                    >
+                        FREE
+                    </option>
+
+                    <option value="plano1"
+                        ${user.tipo_acesso === "plano1" ? "selected" : ""}
+                    >
+                        Plano 1
+                    </option>
+
+                    <option value="plano2"
+                        ${user.tipo_acesso === "plano2" ? "selected" : ""}
+                    >
+                        Plano 2
+                    </option>
+
+                    <option value="combo"
+                        ${user.tipo_acesso === "combo" ? "selected" : ""}
+                    >
+                        Combo
+                    </option>
+
+                    <option value="vitalicio"
+                        ${user.tipo_acesso === "vitalicio" ? "selected" : ""}
+                    >
+                        Vitalício
+                    </option>
+
+                </select>
+
+            </td>
+
+            <td>
+
+                
+
+    ${
+      user.is_pago
+        ? `
+            <span
+                style="
+                    background:#14532d;
+                    color:#86efac;
+                    padding:6px 10px;
+                    border-radius:999px;
+                    font-size:13px;
+                    font-weight:bold;
+                "
+            >
+                ✅ Pago
+            </span>
+        `
+        : `
+            <span
+                style="
+                    background:#7f1d1d;
+                    color:#fca5a5;
+                    padding:6px 10px;
+                    border-radius:999px;
+                    font-size:13px;
+                    font-weight:bold;
+                "
+            >
+                ❌ Não Pago
+            </span>
+        `
+    }
+
+</td>
+
+
+            <td>
+                ${
+                  user.data_pagamento
+                    ? new Date(user.data_pagamento).toLocaleDateString("pt-BR")
+                    : "---"
+                }
+            </td>
+
+            <td>
+                ${
+                  user.data_expiracao
+                    ? new Date(user.data_expiracao).toLocaleDateString("pt-BR")
+                    : "---"
+                }
+            </td>
+
+            <td>
+
+                <button
+                    onclick="salvarPlano('${user.id}')"
+                    style="
+                        background:#2563eb;
+                        color:white;
+                        border:none;
+                        padding:10px 14px;
+                        border-radius:10px;
+                        cursor:pointer;
+                    "
+                >
+                    Salvar
+                </button>
+
+            </td>
+
+        </tr>
+
+    `,
+      )
+      .join("")}
+
+</tbody>
+
+            </table>
+
+        </div>
+    `;
+      }
+
+      async function abrirConfiguracoes() {
+        const main = document.getElementById("conteudo-principal");
+
+        const {
+          data: { session },
+        } = await supabaseClient.auth.getSession();
+
+        if (!session?.user) return;
+
+        const user = session.user;
+
+        const { data: userTable } = await supabaseClient
+          .from("users")
+          .select("*")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        main.innerHTML = `
+
+        <div class="titulo">
+            <h1>⚙️ Configurações da Conta</h1>
+        </div>
+
+        <div
+            style="
+                background:#1e293b;
+                padding:30px;
+                border-radius:20px;
+                border:1px solid #334155;
+                max-width:700px;
+            "
+        >
+
+            <div style="margin-bottom:20px;">
+
+                <div class="campo">
+                    <input
+                        id="novo-nome"
+                        value="${userTable?.nome || ""}"
+                        required
+                    /><br /><br />
+                    <label for="novo-nome">Nome</label><br />
+                </div>
+
+            </div>
+
+            <div style="margin-bottom:20px;">
+
+                <div class="campo">
+                    <input
+                        id="novo-email"
+                        value="${user.email}"
+                        required
+                    /><br /><br />
+                    <label for="novo-email">Email</label><br />
+                </div>
+
+            </div>
+
+            <div style="margin-bottom:20px;">
+
+                <div class="campo">
+                    <input id="nova-senha"
+                        type="password"
+                        required
+                    /><br /><br />
+                    <label for="nova-senha">Digite nova senha</label><br />
+                </div>
+
+            </div>
+
+            <button
+                onclick="salvarConfiguracoes()"
+                style="
+                    background:#2563eb;
+                    color:white;
+                    border:none;
+                    padding:14px 20px;
+                    border-radius:12px;
+                    cursor:pointer;
+                    font-size:16px;
+                "
+            >
+                💾 Salvar Alterações
+            </button>
+
+        </div>
+    `;
+      }
+
+      async function salvarConfiguracoes() {
+        const novoNome = document.getElementById("novo-nome").value;
+
+        const novoEmail = document.getElementById("novo-email").value;
+
+        const novaSenha = document.getElementById("nova-senha").value;
+
+        const {
+          data: { session },
+        } = await supabaseClient.auth.getSession();
+
+        if (!session?.user) return;
+
+        const userId = session.user.id;
+
+        // ====================================
+        // UPDATE AUTH
+        // ====================================
+
+        const updateData = {};
+
+        if (novoEmail !== session.user.email) {
+          updateData.email = novoEmail;
+        }
+
+        if (novaSenha.length >= 6) {
+          updateData.password = novaSenha;
+        }
+
+        if (Object.keys(updateData).length > 0) {
+          const { error: authError } =
+            await supabaseClient.auth.updateUser(updateData);
+
+          if (authError) {
+            console.error(authError);
+            alert(authError.message);
+            return;
+          }
+        }
+
+        // ====================================
+        // UPDATE TABELA USERS
+        // ====================================
+
+        const { error: userError } = await supabaseClient
+          .from("users")
+          .update({
+            nome: novoNome,
+            email: novoEmail,
+          })
+          .eq("id", userId);
+
+        if (userError) {
+          console.error(userError);
+          alert("Erro ao atualizar dados.");
+          return;
+        }
+
+        alert("Dados atualizados com sucesso!");
+
+        window.location.reload();
+      }
+
+      async function salvarPlano(userId) {
+        const novoPlano = document.getElementById(`plano-${userId}`).value;
+
+        const isPago =
+          document.getElementById(`pago-${userId}`).value === "true";
+
+        let dataPagamento = null;
+        let dataExpiracao = null;
+
+        // ====================================
+        // DEFINE DATAS
+        // ====================================
+
+        if (isPago) {
+          dataPagamento = new Date();
+
+          // adiciona 30 dias
+          dataExpiracao = new Date();
+          dataExpiracao.setDate(dataExpiracao.getDate() + 30);
+        }
+
+        const { error } = await supabaseClient
+          .from("users")
+          .update({
+            tipo_acesso: novoPlano,
+            is_pago: isPago,
+            data_pagamento: dataPagamento,
+            data_expiracao: dataExpiracao,
+          })
+          .eq("id", userId);
+
+        if (error) {
+          console.error(error);
+          alert("Erro ao salvar.");
+          return;
+        }
+
+        alert("Usuário atualizado!");
+
+        abrirUsuarios();
+      }
+
+      // ======================================================
+      // FORMATAR TEMPO
+      // ======================================================
+
+      function formatarTempo(segundos) {
+        if (!segundos) return "--:--";
+
+        const minutos = Math.floor(segundos / 60)
+          .toString()
+          .padStart(2, "0");
+
+        const segundosRestantes = (segundos % 60).toString().padStart(2, "0");
+
+        return `${minutos}:${segundosRestantes}`;
+      }
+    </script>
+  </body>
+</html>

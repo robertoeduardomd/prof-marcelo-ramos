@@ -319,7 +319,7 @@ function mostrarToast(msg, tipo) {
 // 🏁 FINALIZAR
 // =======================
 
-function finalizarJogo() {
+async function finalizarJogo() {
   clearInterval(intervalo);
 
   liberarScroll();
@@ -348,6 +348,15 @@ function finalizarJogo() {
 
   btnIniciar.style.display = "block";
   btnIniciar.innerText = "Reiniciar";
+
+
+  // Envia para o Supabase para histórico e controle de conta
+ await SistemaAcesso.salvarPartida(
+   "notas",
+   acertos,
+   erros,
+   tempo
+);
 
   jogoIniciado = false;
 }
@@ -397,7 +406,30 @@ function responder() {
 // 🚀 INICIAR JOGO
 // =======================
 
-function iniciarJogo() {
+async function iniciarJogo() {
+const acesso = await SistemaAcesso.podeJogar("notas");
+    console.log("Resultado do acesso:", acesso);
+  // Busca o status do usuário
+  
+
+  // Se não tiver acesso
+  if (!acesso.liberado) {
+
+    const modalPlanos =
+      document.getElementById('modal-planos');
+
+    if (modalPlanos) {
+      modalPlanos.style.display = "flex";
+    } else {
+      alert(
+        "Limite de jogadas gratuitas atingido."
+      );
+    }
+
+    return;
+  }
+
+  // Inicia jogo normalmente
   jogoIniciado = true;
 
   travarScroll();
@@ -406,17 +438,25 @@ function iniciarJogo() {
   erros = 0;
   total = 0;
   listaErros = [];
+
   configEl.style.display = "none";
+
   btnIniciar.style.display = "none";
+
   perguntaEl.style.display = "block";
 
   resultadoFinalEl.style.display = "none";
+
   resultadoFinalEl.classList.remove("resultado-erro");
+
   resultadoFinalEl.innerText = "";
 
   gerarListaPerguntas();
+
   gerarPergunta();
+
   atualizarPlacar();
+
   iniciarTimer();
 }
 
@@ -459,7 +499,7 @@ function copiarPix() {
 
 const btnAjuda = document.getElementById("btnAjuda");
 const modalAjuda = document.getElementById("modalAjuda");
-const fecharModal = document.getElementById("fecharModal");
+const btnFecharModal = document.getElementById("fecharModal");
 const imgInstrumento = document.getElementById("imagemInstrumento");
 
 // 🔥 MAPEAMENTO DAS IMAGENS
@@ -483,7 +523,7 @@ btnAjuda.addEventListener("click", () => {
 });
 
 // FECHAR
-fecharModal.addEventListener("click", () => {
+btnFecharModal.addEventListener("click", () => {
   modalAjuda.style.display = "none";
 });
 
