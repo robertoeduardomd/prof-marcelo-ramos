@@ -593,7 +593,7 @@ input {
 }
 
 .btn-cancelar {
-    background: transparent;
+    background: red;
     color: #94a3b8;
     border: none;
     cursor: pointer;

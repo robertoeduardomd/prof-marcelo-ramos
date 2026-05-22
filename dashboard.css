@@ -304,5 +304,11 @@ button {
 .toast-verde { background-color: #16a34a; }
 .toast-vermelho { background-color: #dc2626; }
 .toast-amarelo { background-color: #ca8a04; color: #000; }
-
+.btn-cancelar {
+    background: red;
+    color: #94a3b8;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+}
 @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; } }
