@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Página não encontrada</title>
+    <style>
+      @font-face {
+        font-family: "musicaltone";
+        src: url("MusicalTone-7BJ4A.otf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "musicnote";
+        src: url("MusicNoteFive-eZx4x.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "dtnoted";
+        src: url("Dtnoted-MOyx.ttf") format("truetype");
+      }
+      body {
+        background: #500600;
+        color: white;
+        font-family: musicaltone, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        text-align: center;
+        letter-spacing: 5px;
+      }
+      h1 {
+        font-size: 10rem;
+        margin: 0;
+        color: #fa004f;
+        animation: rodandopelatela 10s ease-in-out infinite;
+      }
+      p {
+        font-size: 4.5rem;
+        margin-bottom: 20px;
+      }
+      .btn {
+        padding: 12px 24px;
+        background: #2563eb;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+      }
+      .btn:hover {
+        background: #1d4ed8;
+        transform: translateY(-2px);
+      }
+
+      /* Responsividade para Tablets */
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 4rem;
+        }
+        p {
+          font-size: 1.1rem;
+        }
+      }
+
+      /* Responsividade para Celulares */
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 3rem;
+        }
+        .btn {
+          width: 100%;
+          max-width: 250px;
+          padding: 12px;
+        }
+      }
+      @keyframes rodandopelatela {
+        0% {
+          transform: rotate(0deg);
+          translate: 0px 0px;
+        }
+        25% {
+          transform: rotate(360deg);
+          translate: 500px 100px;
+        }
+        50% {
+          transform: rotate(0deg);
+          translate: -500px 100px;
+        }
+        75% {
+          transform: rotate(-360deg);
+          translate: -500px 500px;
+        }
+        90% {
+          transform: rotate(360deg);
+          translate: 500px -500px;
+        }
+        100% {
+           transform: rotate(0deg);
+          translate: 0px 0px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Erro 404</h1>
+    <p>Ops! Voce esta em uma pagina que nao existe.</p>
+    <a href="index.html" class="btn">Voltar para o Início</a>
+  </body>
+</html>
