@@ -3,6 +3,27 @@ const supabaseClient = supabase.createClient(
   "sb_publishable_UdO0kPTujX_15J9c3TpGdA_Lkq79XSv",
 );
 
+ function mostrarToast(mensagem, tipo = 'verde') {
+    const container = document.getElementById("toast-container");
+    const div = document.createElement("div");
+    
+    // Mapeia o tipo para a classe CSS
+    const classes = {
+        'verde': 'toast toast-verde',
+        'vermelho': 'toast toast-vermelho',
+        'amarelo': 'toast toast-amarelo'
+    };
+    
+    div.className = classes[tipo] || classes['verde'];
+    div.innerText = mensagem;
+    
+    container.appendChild(div);
+    
+    // Remove após 3 segundos
+    setTimeout(() => {
+        div.remove();
+    }, 3000);
+}
 const SistemaAcesso = {
   // 1. Obtém o ID (UUID) real da sessão ou gera um guest_id para visitantes
   async obterIdentificador() {
@@ -110,7 +131,7 @@ async recuperarSenha(email) {
 
 const InterfaceUsuario = {
   modoCadastro: false,
-
+  
   async atualizarHeader() {
     const nomeElemento = document.getElementById("nome-usuario");
     const linkPainel = document.getElementById("linkpainel");
@@ -199,7 +220,7 @@ const InterfaceUsuario = {
       textoAlternar.innerText = "Não tem conta?";
     }
   },
-
+  
   async processarAuth() {
     const email = document.getElementById("auth-email").value.trim();
     const senha = document.getElementById("auth-senha").value.trim();
@@ -296,7 +317,29 @@ const InterfaceUsuario = {
 
       window.location.reload();
     }
+    
   },
+   async  mostrarToast(mensagem, tipo = 'verde') {
+    const container = document.getElementById("toast-container");
+    const div = document.createElement("div");
+    
+    // Mapeia o tipo para a classe CSS
+    const classes = {
+        'verde': 'toast toast-verde',
+        'vermelho': 'toast toast-vermelho',
+        'amarelo': 'toast toast-amarelo'
+    };
+    
+    div.className = classes[tipo] || classes['verde'];
+    div.innerText = mensagem;
+    
+    container.appendChild(div);
+    
+    // Remove após 3 segundos
+    setTimeout(() => {
+        div.remove();
+    }, 3000);
+}
 };
 
 function fecharModais() {
@@ -332,12 +375,14 @@ async function testarConexao() {
   }
 }
 async function abrirModalRecuperacao() {
-    const email = prompt("Digite seu e-mail para receber o link de redefinição:");
-    if (email) {
-        const sucesso = await SistemaAcesso.recuperarSenha(email);
-        if (sucesso) {
-            alert("Enviamos um e-mail para você!");
-        }
+    // 1. Fecha modais abertos (caso existam)
+    fecharModais(); 
+    
+    // 2. Em vez de usar prompt(), mostramos seu modal de recuperação
+    // Certifique-se de que no seu HTML o ID seja 'modal-esqueci'
+    const modal = document.getElementById("modal-esqueci");
+    if (modal) {
+        modal.style.display = "flex";
     }
 }
 // --- FUNÇÕES DE CONTROLE DOS MODAIS ---
@@ -356,14 +401,18 @@ function fecharModal(id) {
 // Processa o envio do e-mail de recuperação
 async function processarRecuperacao() {
     const email = document.getElementById("email-recuperacao").value.trim();
-    if (!email) return alert("Digite um e-mail válido.");
+    
+    if (!email) {
+        InterfaceUsuario.mostrarToast("Digite um e-mail válido.", "amarelo");
+        return;
+    }
 
     try {
         await SistemaAcesso.recuperarSenha(email);
-        alert("Sucesso! Verifique seu e-mail para redefinir a senha.");
+        InterfaceUsuario.mostrarToast("Enviamos um e-mail de redefinição para você!", "verde");
         fecharModal('modal-esqueci');
     } catch (error) {
-        alert("Erro ao enviar e-mail: " + error.message);
+        InterfaceUsuario.mostrarToast("Erro ao enviar: " + error.message, "vermelho");
     }
 }
 
@@ -375,4 +424,5 @@ window.addEventListener('load', () => {
         document.getElementById("modal-resetar").style.display = "flex";
     }
 });
+
 testarConexao();

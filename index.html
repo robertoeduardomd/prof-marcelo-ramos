@@ -49,7 +49,7 @@
     
   </head>
   <body>
-    
+    <div id="toast-container"></div>
     <main class="wrapper">
       <section class="card">
         <div class="perfil">
@@ -269,18 +269,6 @@ function mostrarMensagem(texto) {
 function fecharModal(id) { document.getElementById(id).style.display = "none"; }
 function abrirModalRecuperacao() { document.getElementById("modal-esqueci").style.display = "flex"; }
 
-async function processarRecuperacao() {
-    const email = document.getElementById("email-recuperacao").value.trim();
-    if (!email) return mostrarMensagem("Digite um e-mail.");
-    
-    try {
-        await SistemaAcesso.recuperarSenha(email);
-        fecharModal('modal-esqueci');
-        mostrarMensagem("Link enviado! Verifique seu e-mail.");
-    } catch (e) {
-        mostrarMensagem("Erro: " + e.message);
-    }
-}
 
 async function trocarSenha() {
     const novaSenha = document.getElementById('nova-senha-input').value;

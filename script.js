@@ -533,3 +533,24 @@ modalAjuda.addEventListener("click", (e) => {
     modalAjuda.style.display = "none";
   }
 });
+ function mostrarToast(mensagem, tipo = 'verde') {
+    const container = document.getElementById("toast-container");
+    const div = document.createElement("div");
+    
+    // Mapeia o tipo para a classe CSS
+    const classes = {
+        'verde': 'toast toast-verde',
+        'vermelho': 'toast toast-vermelho',
+        'amarelo': 'toast toast-amarelo'
+    };
+    
+    div.className = classes[tipo] || classes['verde'];
+    div.innerText = mensagem;
+    
+    container.appendChild(div);
+    
+    // Remove após 3 segundos
+    setTimeout(() => {
+        div.remove();
+    }, 3000);
+}
