@@ -281,3 +281,25 @@ button {
     border: none;
     border-radius: 4px;
 }
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast {
+    padding: 15px 25px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s;
+}
+
+.toast-verde { background-color: #16a34a; }
+.toast-vermelho { background-color: #dc2626; }
+.toast-amarelo { background-color: #ca8a04; color: #000; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; } }

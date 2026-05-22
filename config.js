@@ -181,17 +181,20 @@ const InterfaceUsuario = {
     this.modoCadastro = !this.modoCadastro;
     const titulo = document.getElementById("auth-titulo");
     const campoNome = document.getElementById("auth-nome");
+    const labelNome = document.querySelector('label[for="auth-nome"]');
     const linkAlternar = document.getElementById("auth-link");
     const textoAlternar = document.getElementById("auth-texto-alternar");
 
     if (this.modoCadastro) {
       titulo.innerText = "Criar Conta";
       campoNome.style.display = "block";
+      labelNome.style.display = "flex";
       linkAlternar.innerText = "Já tenho conta";
       textoAlternar.innerText = "";
     } else {
       titulo.innerText = "Entrar no Sistema";
       campoNome.style.display = "none";
+      labelNome.style.display = "none";
       linkAlternar.innerText = "Cadastre-se";
       textoAlternar.innerText = "Não tem conta?";
     }

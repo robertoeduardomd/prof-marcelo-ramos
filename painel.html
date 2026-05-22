@@ -10,6 +10,7 @@
   
   </head>
   <body>
+    <div id="toast-container"></div>
     <aside class="sidebar">
       <div class="perfil">
         <h2 id="nome-usuario">Carregando...</h2>
@@ -649,48 +650,30 @@
 
         window.location.reload();
       }
+async function salvarPlano(userId) {
+    const elementoPlano = document.getElementById(`plano-${userId}`);
+    
+    if (!elementoPlano) {
+        mostrarToast("Erro: Elemento não encontrado.", "vermelho");
+        return;
+    }
 
-      async function salvarPlano(userId) {
-        const novoPlano = document.getElementById(`plano-${userId}`).value;
+    const novoPlano = elementoPlano.value;
 
-        const isPago =
-          document.getElementById(`pago-${userId}`).value === "true";
+    const { error } = await supabaseClient
+        .from("users")
+        .update({ tipo_acesso: novoPlano })
+        .eq("id", userId);
 
-        let dataPagamento = null;
-        let dataExpiracao = null;
+    if (error) {
+        console.error(error);
+        mostrarToast("Erro ao salvar alteração: " + error.message, "vermelho");
+        return;
+    }
 
-        // ====================================
-        // DEFINE DATAS
-        // ====================================
-
-        if (isPago) {
-          dataPagamento = new Date();
-
-          // adiciona 30 dias
-          dataExpiracao = new Date();
-          dataExpiracao.setDate(dataExpiracao.getDate() + 30);
-        }
-
-        const { error } = await supabaseClient
-          .from("users")
-          .update({
-            tipo_acesso: novoPlano,
-            is_pago: isPago,
-            data_pagamento: dataPagamento,
-            data_expiracao: dataExpiracao,
-          })
-          .eq("id", userId);
-
-        if (error) {
-          console.error(error);
-          alert("Erro ao salvar.");
-          return;
-        }
-
-        alert("Usuário atualizado!");
-
-        abrirUsuarios();
-      }
+    mostrarToast("Plano atualizado com sucesso!", "verde");
+    abrirUsuarios();
+}
 
       // ======================================================
       // FORMATAR TEMPO
@@ -707,6 +690,27 @@
 
         return `${minutos}:${segundosRestantes}`;
       }
+      function mostrarToast(mensagem, tipo = 'verde') {
+    const container = document.getElementById("toast-container");
+    const div = document.createElement("div");
+    
+    // Mapeia o tipo para a classe CSS
+    const classes = {
+        'verde': 'toast toast-verde',
+        'vermelho': 'toast toast-vermelho',
+        'amarelo': 'toast toast-amarelo'
+    };
+    
+    div.className = classes[tipo] || classes['verde'];
+    div.innerText = mensagem;
+    
+    container.appendChild(div);
+    
+    // Remove após 3 segundos
+    setTimeout(() => {
+        div.remove();
+    }, 3000);
+}
     </script>
   </body>
 </html>

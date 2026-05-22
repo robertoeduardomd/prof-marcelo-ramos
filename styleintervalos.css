@@ -344,3 +344,11 @@ input {
     cursor: pointer;
     margin-right: 10px;
 }
+.hidden {
+    display: none !important;
+}
+
+/* Garante que o input e o label apareçam quando necessário */
+.visible {
+    display: block !important;
+}

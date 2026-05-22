@@ -62,7 +62,7 @@
         <div>
           <span id="nome-usuario">Carregando...</span>
           <br />
-          <span id="plano-usuario">Carregando...</span>
+          <span id="plano-usuario">Plano: free</span>
         </div>
 
         <a id="linkindex" href="index.html">prof marcelo ramos </a>
@@ -280,24 +280,18 @@
           "
         >
           <div class="campo">
-            <input
-              type="text"
-              id="auth-nome"
-              required
-              style="display: none"
-            /><br /><br />
-            <label for="auth-nome" style="display: none"
-              >Seu Nome (para cadastro)</label
-            ><br />
+            <input type="text" id="auth-nome" class="hidden" style="display:none;" required />
+            <label for="auth-nome" id="label-nome" class="hidden" style="display:none;">Nome</label>                                                                                                            
+            <br />
           </div>
 
           <div class="campo">
-            <input type="email" id="auth-email" required /><br /><br />
+            <input type="email" id="auth-email" required /><br />
             <label for="auth-email">E-mail</label><br />
           </div>
 
           <div class="campo">
-            <input type="password" id="auth-senha" required /><br /><br />
+            <input type="password" id="auth-senha" required /><br />
             <label for="auth-senha">Sua senha</label><br />
           </div>
 

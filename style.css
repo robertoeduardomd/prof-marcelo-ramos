@@ -581,7 +581,7 @@ footer a:hover{
     width: 300px;
     height: 30px;
     outline: none;
-    border: 2px solid purple;
+    border: 2px solid rgb(1, 11, 104);
     font-size: 15px;
     left: 5px;
     letter-spacing: 1px;
@@ -593,7 +593,7 @@ footer a:hover{
 
 .campo label {
     position: absolute;
-    color: purple;
+    color: blue;
     font-weight: 500;
     top: 7px;
     left: 20px;
@@ -605,5 +605,5 @@ footer a:hover{
 .campo input:valid~label {
     top: -15px;
     font-size: 13px;
-    color: rgb(219, 27, 59);
+    color: white;
 }
