@@ -30,6 +30,7 @@
         margin: 0;
         text-align: center;
         letter-spacing: 5px;
+        overflow: hidden;
       }
       h1 {
         font-size: 10rem;
@@ -79,24 +80,29 @@
         0% {
           transform: rotate(0deg);
           translate: 0px 0px;
+           color: #fa004f;
         }
         25% {
           transform: rotate(360deg);
           translate: 500px 100px;
         }
         50% {
+            color: white;
           transform: rotate(0deg);
           translate: -500px 100px;
         }
         75% {
           transform: rotate(-360deg);
           translate: -500px 500px;
+          color: red;
         }
         90% {
           transform: rotate(360deg);
           translate: 500px -500px;
+          
         }
         100% {
+            
            transform: rotate(0deg);
           translate: 0px 0px;
         }
