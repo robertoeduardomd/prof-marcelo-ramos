@@ -431,7 +431,7 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
     }
 });
 // Adicione esta função ao seu config.js
-async function tricarSenha() {
+async function trocarSenha() {
     const novaSenha = document.getElementById("nova-senha-input").value.trim();
     
     if (novaSenha.length < 6) {
