@@ -455,7 +455,7 @@ async function trocarSenha() {
         window.location.hash = "";
         
         // Opcional: Redireciona para o dashboard após 1.5s
-        setTimeout(() => window.location.href = "dashboard.html", 1500);
+        setTimeout(() => window.location.href = "index.html", 1500);
 
     } catch (error) {
         console.error("Erro na atualização:", error);
