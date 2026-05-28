@@ -430,5 +430,36 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
         }
     }
 });
+// Adicione esta função ao seu config.js
+async function tricarSenha() {
+    const novaSenha = document.getElementById("nova-senha-input").value.trim();
+    
+    if (novaSenha.length < 6) {
+        InterfaceUsuario.mostrarToast("A senha precisa ter pelo menos 6 caracteres.", "vermelho");
+        return;
+    }
 
+    try {
+        const { error } = await supabaseClient.auth.updateUser({
+            password: novaSenha
+        });
+
+        if (error) throw error;
+
+        InterfaceUsuario.mostrarToast("Senha alterada com sucesso!", "verde");
+        
+        // Fecha o modal após sucesso
+        document.getElementById("modal-resetar").style.display = "none";
+        
+        // Limpa a URL para remover os tokens de segurança
+        window.location.hash = "";
+        
+        // Opcional: Redireciona para o dashboard após 1.5s
+        setTimeout(() => window.location.href = "dashboard.html", 1500);
+
+    } catch (error) {
+        console.error("Erro na atualização:", error);
+        InterfaceUsuario.mostrarToast("Erro: " + error.message, "vermelho");
+    }
+}
 testarConexao();
