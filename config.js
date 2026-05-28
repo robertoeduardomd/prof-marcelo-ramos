@@ -462,4 +462,35 @@ async function trocarSenha() {
         InterfaceUsuario.mostrarToast("Erro: " + error.message, "vermelho");
     }
 }
+      async function iniciarSistema() {
+    let email = localStorage.getItem("email");
+
+    if (!email) {
+        email = prompt("Digite seu email para começar:");
+        if (!email) return;
+        
+        localStorage.setItem("email", email);
+
+        // Verifica se já existe, se não, insere
+        const { data: existente } = await supabaseClient
+            .from("users")
+            .select("email")
+            .eq("email", email)
+            .maybeSingle();
+
+        if (!existente) {
+            await supabaseClient.from("users").insert([
+                {
+                    email: email,
+                    nome: email.split('@')[0],
+                    tipo_acesso: "free",
+                    is_pago: false
+                }
+            ]);
+        }
+    }
+    
+    // Após logar, você pode liberar os botões para as outras páginas
+    alert("Bem-vindo!");
+}
 testarConexao();
