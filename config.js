@@ -419,9 +419,15 @@ async function processarRecuperacao() {
 // Processa a troca de senha ao clicar no link do e-mail
 
 // Detecta se o usuário veio pelo link do e-mail (ao carregar a página)
-window.addEventListener('load', () => {
-    if (window.location.hash.includes('type=recovery')) {
-        document.getElementById("modal-resetar").style.display = "flex";
+// --- SUBSTITUA POR ESTE BLOCO NO FINAL DO SEU CONFIG.JS ---
+
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    // PASSWORD_RECOVERY é o evento oficial do Supabase quando o usuário clica no link do e-mail
+    if (event === 'PASSWORD_RECOVERY') {
+        const modalReset = document.getElementById("modal-resetar");
+        if (modalReset) {
+            modalReset.style.display = "flex";
+        }
     }
 });
 
