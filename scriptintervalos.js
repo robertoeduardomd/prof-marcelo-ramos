@@ -304,9 +304,8 @@ function criarOpcoes() {
     opcoesEl.appendChild(btn);
   });
 }
-
 function responder(correto, notaClicada = null) {
-  if (bloqueado) return; // Proteção extra contra cliques repetidos
+  if (bloqueado) return; 
   bloqueado = true;
   total++;
 
@@ -320,17 +319,16 @@ function responder(correto, notaClicada = null) {
   }
 
   atualizarPlacar();
-  indiceAtual++;
-
-  // A MUDANÇA ESTÁ AQUI:
-  // Só chamamos gerarPergunta se ainda houver perguntas restantes.
-  // Caso contrário, chamamos finalizarJogo explicitamente.
+  
+  // Espera o feedback visual/sonoro
   setTimeout(() => {
+    indiceAtual++; // Incrementa APENAS aqui
+    
     if (indiceAtual < perguntas.length) {
-      bloqueado = false;
+      bloqueado = false; // Libera para a próxima
       gerarPergunta();
     } else {
-      finalizarJogo(); // Força o fim apenas aqui
+      finalizarJogo(); // Jogo REALMENTE acabou
     }
   }, 400); 
 }
@@ -344,16 +342,15 @@ function embaralhar(array) {
 
 
 async function finalizarJogo() {
-  // Trava de segurança para não salvar duas vezes
-  if (jogoFinalizado) return;
+  // A trava aqui impede o salvamento duplicado sem precisar mexer no iniciarJogo
+  if (typeof jogoFinalizado !== 'undefined' && jogoFinalizado) return;
   jogoFinalizado = true; 
 
-  clearInterval(intervaloTimer);
+  clearInterval(intervaloTimer); // Isso garante que o cronômetro pare
   
   const modoSelecao = document.querySelector("input[name='modo']:checked").value;
   const infoModo = modoSelecao === "intervalo" ? selectIntervalo.value : selectNota.value;
 
-  // Só salva se o jogo realmente terminou
   if (typeof SistemaAcesso !== 'undefined') {
     await SistemaAcesso.salvarPartida("intervalos", acertos, erros, tempo / 100, infoModo);
   }
