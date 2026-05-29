@@ -345,13 +345,15 @@ async function finalizarJogo() {
   clearInterval(intervaloTimer);
   
   if (typeof SistemaAcesso !== 'undefined') {
-      await SistemaAcesso.salvarPartida("intervalos", acertos, erros, tempo);
+    // Enviamos 'tempo / 100' para converter centésimos para segundos decimais
+    await SistemaAcesso.salvarPartida("intervalos", acertos, erros, tempo / 100);
   }
 
   perguntaEl.innerText = "Fim do treino 🎉";
   jogoIniciado = false;
   configEl.style.display = "block";
   btnIniciar.innerText = "Reiniciar";
+  btnIniciar.style.display = "block"; // Garante que o botão apareça
 }
 
 function atualizarPlacar() {
@@ -360,15 +362,19 @@ function atualizarPlacar() {
 
 function iniciarTimer() {
   clearInterval(intervaloTimer);
-  tempo = 0;
+  tempo = 0; // Agora representa centésimos de segundo
+
   intervaloTimer = setInterval(() => {
     tempo++;
-    const minutos = Math.floor(tempo / 60);
-    const segundos = tempo % 60;
-    const minutosFormatados = minutos.toString().padStart(2, "0");
-    const segundosFormatados = segundos.toString().padStart(2, "0");
-    timerEl.innerText = `${minutosFormatados}:${segundosFormatados}`;
-  }, 1000);
+    
+    // Calcula minutos, segundos e centésimos
+    const totalSegundos = Math.floor(tempo / 100);
+    const min = Math.floor(totalSegundos / 60).toString().padStart(2, "0");
+    const seg = (totalSegundos % 60).toString().padStart(2, "0");
+    const centesimos = (tempo % 100).toString().padStart(2, "0");
+    
+    timerEl.innerText = `${min}:${seg}.${centesimos}`;
+  }, 10); // Intervalo de 10ms
 }
 
 function mostrarToast(msg, tipo) {

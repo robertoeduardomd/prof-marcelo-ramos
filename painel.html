@@ -671,17 +671,27 @@
       // FORMATAR TEMPO
       // ======================================================
 
-      function formatarTempo(segundos) {
-        if (!segundos) return "--:--";
+    function formatarTempo(segundos) {
+    if (!segundos || isNaN(segundos)) return "--:--";
 
-        const minutos = Math.floor(segundos / 60)
-          .toString()
-          .padStart(2, "0");
+    // 1. Calcula minutos totais
+    const minutos = Math.floor(segundos / 60)
+        .toString()
+        .padStart(2, "0");
 
-        const segundosRestantes = (segundos % 60).toString().padStart(2, "0");
+    // 2. Calcula segundos inteiros (o que sobra após tirar os minutos)
+    const segundosInteiros = Math.floor(segundos % 60);
 
-        return `${minutos}:${segundosRestantes}`;
-      }
+    // 3. Calcula os centésimos (pega o resto da divisão por 1, multiplica por 100 e arredonda)
+    const centesimos = Math.round((segundos % 1) * 100);
+
+    // 4. Formata tudo com preenchimento de zero à esquerda
+    const segFormatado = segundosInteiros.toString().padStart(2, "0");
+    const centFormatado = centesimos.toString().padStart(2, "0");
+
+    return `${minutos}:${segFormatado}.${centFormatado}`;
+}
+
       function mostrarToast(mensagem, tipo = "verde") {
         const container = document.getElementById("toast-container");
         const div = document.createElement("div");

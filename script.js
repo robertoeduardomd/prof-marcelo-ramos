@@ -286,19 +286,22 @@ function atualizarPlacar() {
 // ⏱️ TIMER
 // =======================
 
+// Substitua sua função iniciarTimer atual por esta:
 function iniciarTimer() {
   clearInterval(intervalo);
-  tempo = 0;
+  tempo = 0; // Agora 'tempo' representa centésimos de segundo
 
   intervalo = setInterval(() => {
-    tempo++;
-    // AJUSTE: Formatação para MM:SS
-    const min = Math.floor(tempo / 60)
-      .toString()
-      .padStart(2, "0");
-    const seg = (tempo % 60).toString().padStart(2, "0");
-    timerEl.innerText = `${min}:${seg}`;
-  }, 1000);
+    tempo++; 
+    
+    // Calcula minutos, segundos e centésimos
+    const totalSegundos = Math.floor(tempo / 100);
+    const min = Math.floor(totalSegundos / 60).toString().padStart(2, "0");
+    const seg = (totalSegundos % 60).toString().padStart(2, "0");
+    const centesimos = (tempo % 100).toString().padStart(2, "0");
+    
+    timerEl.innerText = `${min}:${seg}.${centesimos}`;
+  }, 10); // Executa a cada 10 milissegundos
 }
 
 // =======================
@@ -351,11 +354,12 @@ async function finalizarJogo() {
 
 
   // Envia para o Supabase para histórico e controle de conta
- await SistemaAcesso.salvarPartida(
+// Dentro da sua função finalizarJogo, mantenha a chamada como está:
+await SistemaAcesso.salvarPartida(
    "notas",
    acertos,
    erros,
-   tempo
+   tempo / 100 // Enviamos em segundos com casas decimais (ex: 35.45)
 );
 
   jogoIniciado = false;
