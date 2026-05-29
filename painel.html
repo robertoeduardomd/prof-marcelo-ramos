@@ -135,32 +135,33 @@
         abrirPagina("notas");
       };
 
-    async function abrirRanking() {
-  const main = document.getElementById("conteudo-principal");
-  main.innerHTML = `<div class="titulo"><h1>Carregando ranking...</h1></div>`;
+      async function abrirRanking() {
+        const main = document.getElementById("conteudo-principal");
+        main.innerHTML = `<div class="titulo"><h1>Carregando ranking...</h1></div>`;
 
-  // Buscamos com JOIN na tabela users para pegar o nome
-  // Ordenamos: 1º pelo app, 2º pelos acertos (mais é melhor), 3º pelo tempo (menos é melhor)
-  const { data, error } = await supabaseClient
-    .from("historico_jogadas")
-    .select("*, users(nome)")
-    .order("app", { ascending: true })
-    .order("acertos", { ascending: false })
-    .order("tempo_segundos", { ascending: true });
+        // Buscamos com JOIN na tabela users para pegar o nome
+        // Ordenamos: 1º pelo app, 2º pelos acertos (mais é melhor), 3º pelo tempo (menos é melhor)
+        const { data, error } = await supabaseClient
+          .from("historico_jogadas")
+          .select("*, users(nome)")
+          .order("app", { ascending: true })
+          .order("acertos", { ascending: false })
+          .order("tempo_segundos", { ascending: true });
 
-  if (error) {
-    console.error("Erro ao buscar ranking:", error);
-    main.innerHTML = `<div class="titulo"><h1>Erro ao carregar</h1></div>`;
-    return;
-  }
+        if (error) {
+          console.error("Erro ao buscar ranking:", error);
+          main.innerHTML = `<div class="titulo"><h1>Erro ao carregar</h1></div>`;
+          return;
+        }
 
-  let html = `
+        let html = `
     <div class="titulo"><h1>🏆 Ranking Geral</h1></div>
     <div class="historico-box">
       <table>
         <thead>
           <tr>
-            <th>Jogo/Modo</th>
+            <th>Jogo</th>
+            <th>Modo</th>
             <th>Posição</th>
             <th>Usuário</th>
             <th>Acertos</th>
@@ -170,76 +171,77 @@
         <tbody>
   `;
 
-  let jogoAtual = "";
-  let posicao = 0;
+        let jogoAtual = "";
+        let posicao = 0;
 
-  data.forEach((item) => {
-    // Se o jogo mudou, reinicia a contagem de posição
-    if (item.app !== jogoAtual) {
-      jogoAtual = item.app;
-      posicao = 1;
-    } else {
-      posicao++;
-    }
+        data.forEach((item) => {
+          // Se o jogo mudou, reinicia a contagem de posição
+          if (item.app !== jogoAtual) {
+            jogoAtual = item.app;
+            posicao = 1;
+          } else {
+            posicao++;
+          }
+          const detalhe = item.modo_jogo || "---";
+          // Destaque visual apenas para o Top 3 de cada jogo
+          let classeCss = "";
+          if (posicao === 1) classeCss = "ranking-ouro";
+          else if (posicao === 2) classeCss = "ranking-prata";
+          else if (posicao === 3) classeCss = "ranking-bronze";
 
-    // Destaque visual apenas para o Top 3 de cada jogo
-    let classeCss = "";
-    if (posicao === 1) classeCss = "ranking-ouro";
-    else if (posicao === 2) classeCss = "ranking-prata";
-    else if (posicao === 3) classeCss = "ranking-bronze";
-
-    html += `
+          html += `
       <tr class="${classeCss}">
         <td><strong>${item.app.toUpperCase()}</strong></td>
+        <td>${detalhe}</td>
         <td>${posicao}º</td>
         <td>${item.users?.nome || "Músico"}</td>
         <td>${item.acertos}</td>
         <td>${formatarTempo(item.tempo_segundos)}</td>
       </tr>
     `;
-  });
+        });
 
-  html += `</tbody></table></div>`;
-  main.innerHTML = html;
-}
+        html += `</tbody></table></div>`;
+        main.innerHTML = html;
+      }
       // ======================================================
       // ABRIR PÁGINA
       // ======================================================
 
-    async function abrirPagina(nomeApp) {
-  const main = document.getElementById("conteudo-principal");
-  main.innerHTML = `<div class="titulo"><h1>Carregando...</h1></div>`;
+      async function abrirPagina(nomeApp) {
+        const main = document.getElementById("conteudo-principal");
+        main.innerHTML = `<div class="titulo"><h1>Carregando...</h1></div>`;
 
-  // 1. Busca os dados apenas deste app para este usuário
-  const { data, error } = await supabaseClient
-    .from("historico_jogadas")
-    .select("*")
-    .eq("app", nomeApp)
-    .eq("identificador", usuarioAtual.id) // Garante que só pega o do usuário
-    .order("acertos", { ascending: false })
-    .order("tempo_segundos", { ascending: true });
+        // 1. Busca os dados apenas deste app para este usuário
+        const { data, error } = await supabaseClient
+          .from("historico_jogadas")
+          .select("*")
+          .eq("app", nomeApp)
+          .eq("identificador", usuarioAtual.id) // Garante que só pega o do usuário
+          .order("acertos", { ascending: false })
+          .order("tempo_segundos", { ascending: true });
 
-  if (error) {
-    console.error("Erro ao buscar histórico:", error);
-    main.innerHTML = `<div class="titulo"><h1>Erro ao carregar</h1></div>`;
-    return;
-  }
+        if (error) {
+          console.error("Erro ao buscar histórico:", error);
+          main.innerHTML = `<div class="titulo"><h1>Erro ao carregar</h1></div>`;
+          return;
+        }
 
-  const dados = data || [];
+        const dados = data || [];
 
-  // 2. Lógica para encontrar o recorde (agora funciona pois 'dados' está preenchido)
-  let melhorPartida = dados.length > 0 ? dados[0] : null;
+        // 2. Lógica para encontrar o recorde (agora funciona pois 'dados' está preenchido)
+        let melhorPartida = dados.length > 0 ? dados[0] : null;
 
-  // 3. Renderização
-  const nomesBonitos = {
-    notas: "Notas no Braço do Instrumento",
-    intervalos: "Intervalos",
-  };
+        // 3. Renderização
+        const nomesBonitos = {
+          notas: "Notas no Braço do Instrumento",
+          intervalos: "Intervalos",
+        };
 
-  const tituloBonito = nomesBonitos[nomeApp] || nomeApp;
-  const ultimaJogada = dados.length > 0 ? dados[0] : null;
+        const tituloBonito = nomesBonitos[nomeApp] || nomeApp;
+        const ultimaJogada = dados.length > 0 ? dados[0] : null;
 
-  main.innerHTML = `
+        main.innerHTML = `
     <div class="titulo"><h1>${tituloBonito}</h1></div>
     <div class="cards-topo">
         <div class="info-card">
@@ -258,23 +260,31 @@
     </div>
     <div class="historico-box">
         <div class="historico-topo"><h2>Histórico</h2></div>
-        ${dados.length === 0 ? `<div class="vazio">Nenhuma partida encontrada.</div>` : `
+        ${
+          dados.length === 0
+            ? `<div class="vazio">Nenhuma partida encontrada.</div>`
+            : `
         <table>
             <thead><tr><th>Data</th><th>Acertos</th><th>Erros</th><th>Tempo</th></tr></thead>
             <tbody>
-                ${dados.map((item) => `
+                ${dados
+                  .map(
+                    (item) => `
                     <tr>
                         <td>${new Date(item.created_at).toLocaleDateString("pt-BR")}</td>
                         <td>${item.acertos || 0}</td>
                         <td>${item.erros || 0}</td>
                         <td>${formatarTempo(item.tempo_segundos)}</td>
                     </tr>
-                `).join("")}
+                `,
+                  )
+                  .join("")}
             </tbody>
-        </table>`}
+        </table>`
+        }
     </div>
   `;
-}
+      }
 
       // ======================================================
       // USUÁRIOS ADMIN
