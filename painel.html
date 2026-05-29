@@ -6,8 +6,7 @@
     <title>Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <link rel="stylesheet" href="dashboard.css">
-  
+    <link rel="stylesheet" href="dashboard.css" />
   </head>
   <body>
     <div id="toast-container"></div>
@@ -141,131 +140,121 @@
       // ABRIR PÁGINA
       // ======================================================
 
-      function abrirPagina(nomeApp) {
-        const main = document.getElementById("conteudo-principal");
+    function abrirPagina(nomeApp) {
+  const main = document.getElementById("conteudo-principal");
+  const dados = historicoGlobal.filter((item) => item.app === nomeApp);
 
-        const dados = historicoGlobal.filter((item) => item.app === nomeApp);
+  // 1. Lógica para encontrar o registro recordista
+  let melhorPartida = null;
 
-        let melhorTempo = null;
+  dados.forEach((item) => {
+    if (!melhorPartida) {
+      melhorPartida = item;
+      return;
+    }
 
-        const nomesBonitos = {
-          notas: "Notas no Braço do Instrumento",
-          intervalos: "Intervalos",
-        };
-
-        const tituloBonito = nomesBonitos[nomeApp] || nomeApp;
-
-        dados.forEach((item) => {
-          if (
-            item.tempo_segundos &&
-            (melhorTempo === null || item.tempo_segundos < melhorTempo)
-          ) {
-            melhorTempo = item.tempo_segundos;
-          }
-        });
-
-        const ultimaJogada = dados[0];
-
-        main.innerHTML = `
-
-              <div class="titulo">
-                 <h1>${tituloBonito}</h1>
-              </div>
-
-              <div class="cards-topo">
-
-                  <div class="info-card">
-                      <span>🏆 Seu Melhor Tempo</span>
-                      <h2>
-                          ${formatarTempo(melhorTempo)}
-                      </h2>
-                  </div>
-
-                  <div class="info-card">
-                      <span>🎮 Partidas Jogadas</span>
-                      <h2>${dados.length}</h2>
-                  </div>
-
-                  <div class="info-card">
-                      <span>📅 Última Tentativa</span>
-                      <h2 style="font-size:20px;">
-                          ${
-                            ultimaJogada
-                              ? new Date(
-                                  ultimaJogada.created_at,
-                                ).toLocaleDateString("pt-BR")
-                              : "--"
-                          }
-                      </h2>
-                  </div>
-
-              </div>
-
-              <div class="historico-box">
-
-                  <div class="historico-topo">
-                      <h2>Histórico</h2>
-                  </div>
-
-                  ${
-                    dados.length === 0
-                      ? `
-                          <div class="vazio">
-                              Nenhuma partida encontrada.
-                          </div>
-                      `
-                      : `
-                          <table>
-
-                              <thead>
-                                  <tr>
-                                      <th>Data</th>
-                                      <th>Acertos</th>
-                                      <th>Erros</th>
-                                      <th>Tempo</th>
-                                  </tr>
-                              </thead>
-
-                              <tbody>
-
-                                 ${dados
-                                   .map((item) => {
-                                     // Verifica se o tempo desta linha é o mesmo que o melhor tempo salvo
-                                     const classeDestaque =
-                                       item.tempo_segundos === melhorTempo
-                                         ? 'class="linha-destaque"'
-                                         : "";
-
-                                     return `
-              <tr ${classeDestaque}>
-                  <td>${new Date(item.created_at).toLocaleDateString("pt-BR")}</td>
-                  <td>${item.acertos || 0}</td>
-                  <td>${item.erros || 0}</td>
-                  <td>${formatarTempo(item.tempo_segundos)}</td>
-              </tr>
-              `;
-                                   })
-                                   .join("")}
-
-                              </tbody>
-
-                          </table>
-                      `
-                  }
-
-              </div>
-              <br><br>
-               <div class="apps">
-                <a href="notas_instrumento.html" class="btn btnnotas"
-                  >🎸 Notas no braco do instrumento</a
-                >
-                <a href="intervalos.html" class="btn btn-intervalos"
-                  ><span class="silaba">🎵</span> <span class="silaba">in</span
-                  ><span class="silaba">ter</span><span class="silaba">valos</span></a
-                >
-              </div>
-          `;
+    // Prioridade 1: Mais acertos é melhor
+    if ((item.acertos || 0) > (melhorPartida.acertos || 0)) {
+      melhorPartida = item;
+    } 
+    // Prioridade 2: Se acertos forem iguais, menor tempo é melhor
+    else if ((item.acertos || 0) === (melhorPartida.acertos || 0)) {
+      if (item.tempo_segundos < melhorPartida.tempo_segundos) {
+        melhorPartida = item;
       }
+    }
+  });
+
+  const nomesBonitos = {
+    notas: "Notas no Braço do Instrumento",
+    intervalos: "Intervalos",
+  };
+
+  const tituloBonito = nomesBonitos[nomeApp] || nomeApp;
+  const ultimaJogada = dados[0];
+
+  main.innerHTML = `
+      <div class="titulo">
+          <h1>${tituloBonito}</h1>
+      </div>
+
+      <div class="cards-topo">
+          <div class="info-card">
+              <span>🏆 Seu Recorde</span>
+              <h2>
+                  ${melhorPartida ? formatarTempo(melhorPartida.tempo_segundos) : "--:--"}
+              </h2>
+              <small style="color: #94a3b8;">${melhorPartida ? melhorPartida.acertos + " acertos" : "0 acertos"}</small>
+          </div>
+
+          <div class="info-card">
+              <span>🎮 Partidas Jogadas</span>
+              <h2>${dados.length}</h2>
+          </div>
+
+          <div class="info-card">
+              <span>📅 Última Tentativa</span>
+              <h2 style="font-size:20px;">
+                  ${
+                    ultimaJogada
+                      ? new Date(ultimaJogada.created_at).toLocaleDateString("pt-BR")
+                      : "--"
+                  }
+              </h2>
+          </div>
+      </div>
+
+      <div class="historico-box">
+          <div class="historico-topo">
+              <h2>Histórico</h2>
+          </div>
+          ${
+            dados.length === 0
+              ? `<div class="vazio">Nenhuma partida encontrada.</div>`
+              : `
+              <table>
+                  <thead>
+                      <tr>
+                          <th>Data</th>
+                          <th>Acertos</th>
+                          <th>Erros</th>
+                          <th>Tempo</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      ${dados
+                        .map((item) => {
+                          // Destaque se for o recorde (mesma lógica usada no loop acima)
+                          const ehRecorde = melhorPartida && 
+                                            item.acertos === melhorPartida.acertos && 
+                                            item.tempo_segundos === melhorPartida.tempo_segundos;
+                          
+                          const classeDestaque = ehRecorde ? 'class="linha-destaque"' : "";
+
+                          return `
+                          <tr ${classeDestaque}>
+                              <td>${new Date(item.created_at).toLocaleDateString("pt-BR")}</td>
+                              <td>${item.acertos || 0}</td>
+                              <td>${item.erros || 0}</td>
+                              <td>${formatarTempo(item.tempo_segundos)}</td>
+                          </tr>
+                          `;
+                        })
+                        .join("")}
+                  </tbody>
+              </table>
+              `
+          }
+      </div>
+      <br><br>
+      <div class="apps">
+        <a href="notas_instrumento.html" class="btn btnnotas">🎸 Notas no braco do instrumento</a>
+        <a href="intervalos.html" class="btn btn-intervalos">
+            <span class="silaba">🎵</span> <span class="silaba">in</span><span class="silaba">ter</span><span class="silaba">valos</span>
+        </a>
+      </div>
+  `;
+}
 
       // ======================================================
       // USUÁRIOS ADMIN
@@ -650,30 +639,33 @@
 
         window.location.reload();
       }
-async function salvarPlano(userId) {
-    const elementoPlano = document.getElementById(`plano-${userId}`);
-    
-    if (!elementoPlano) {
-        mostrarToast("Erro: Elemento não encontrado.", "vermelho");
-        return;
-    }
+      async function salvarPlano(userId) {
+        const elementoPlano = document.getElementById(`plano-${userId}`);
 
-    const novoPlano = elementoPlano.value;
+        if (!elementoPlano) {
+          mostrarToast("Erro: Elemento não encontrado.", "vermelho");
+          return;
+        }
 
-    const { error } = await supabaseClient
-        .from("users")
-        .update({ tipo_acesso: novoPlano })
-        .eq("id", userId);
+        const novoPlano = elementoPlano.value;
 
-    if (error) {
-        console.error(error);
-        mostrarToast("Erro ao salvar alteração: " + error.message, "vermelho");
-        return;
-    }
+        const { error } = await supabaseClient
+          .from("users")
+          .update({ tipo_acesso: novoPlano })
+          .eq("id", userId);
 
-    mostrarToast("Plano atualizado com sucesso!", "verde");
-    abrirUsuarios();
-}
+        if (error) {
+          console.error(error);
+          mostrarToast(
+            "Erro ao salvar alteração: " + error.message,
+            "vermelho",
+          );
+          return;
+        }
+
+        mostrarToast("Plano atualizado com sucesso!", "verde");
+        abrirUsuarios();
+      }
 
       // ======================================================
       // FORMATAR TEMPO
@@ -690,27 +682,27 @@ async function salvarPlano(userId) {
 
         return `${minutos}:${segundosRestantes}`;
       }
-      function mostrarToast(mensagem, tipo = 'verde') {
-    const container = document.getElementById("toast-container");
-    const div = document.createElement("div");
-    
-    // Mapeia o tipo para a classe CSS
-    const classes = {
-        'verde': 'toast toast-verde',
-        'vermelho': 'toast toast-vermelho',
-        'amarelo': 'toast toast-amarelo'
-    };
-    
-    div.className = classes[tipo] || classes['verde'];
-    div.innerText = mensagem;
-    
-    container.appendChild(div);
-    
-    // Remove após 3 segundos
-    setTimeout(() => {
-        div.remove();
-    }, 3000);
-}
+      function mostrarToast(mensagem, tipo = "verde") {
+        const container = document.getElementById("toast-container");
+        const div = document.createElement("div");
+
+        // Mapeia o tipo para a classe CSS
+        const classes = {
+          verde: "toast toast-verde",
+          vermelho: "toast toast-vermelho",
+          amarelo: "toast toast-amarelo",
+        };
+
+        div.className = classes[tipo] || classes["verde"];
+        div.innerText = mensagem;
+
+        container.appendChild(div);
+
+        // Remove após 3 segundos
+        setTimeout(() => {
+          div.remove();
+        }, 3000);
+      }
     </script>
   </body>
 </html>
