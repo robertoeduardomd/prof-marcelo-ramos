@@ -131,40 +131,41 @@ historicoGlobal = data || [];
         // abre tela inicial
         abrirPagina("notas");
       };
-async function abrirRanking(nomeApp) {
+async function abrirRanking() {
   const main = document.getElementById("conteudo-principal");
-  
-  // Filtra apenas o app desejado e remove duplicatas (mantendo apenas a melhor partida de cada user)
-  const registros = historicoGlobal.filter(h => h.app === nomeApp);
-  const rankingMap = new Map();
 
-  registros.forEach(item => {
-    const userId = item.identificador;
-    if (!rankingMap.has(userId) || 
-        item.acertos > rankingMap.get(userId).acertos || 
-        (item.acertos === rankingMap.get(userId).acertos && item.tempo_segundos < rankingMap.get(userId).tempo_segundos)) {
-      rankingMap.set(userId, item);
-    }
+  // Ordena todos os registros do histórico global
+  // Primeiro pelo nome do App, depois pelo número de acertos
+  const rankingOrdenado = [...historicoGlobal].sort((a, b) => {
+    if (a.app !== b.app) return a.app.localeCompare(b.app);
+    return b.acertos - a.acertos || a.tempo_segundos - b.tempo_segundos;
   });
 
-  const rankingOrdenado = Array.from(rankingMap.values())
-    .sort((a, b) => b.acertos - a.acertos || a.tempo_segundos - b.tempo_segundos);
-
   let html = `
-    <div class="titulo"><h1>🏆 Ranking: ${nomeApp}</h1></div>
+    <div class="titulo"><h1>🏆 Ranking Geral</h1></div>
     <div class="historico-box">
       <table>
-        <thead><tr><th>Pos</th><th>Usuário</th><th>Acertos</th><th>Tempo</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Pos</th>
+            <th>Jogo/Modo</th>
+            <th>Usuário</th>
+            <th>Acertos</th>
+            <th>Tempo</th>
+          </tr>
+        </thead>
         <tbody>
           ${rankingOrdenado.map((item, index) => {
-            let bgClass = "";
-            if (index === 0) bgClass = 'style="background: #fbbf24; color: black; font-weight: bold;"'; // Ouro
-            else if (index === 1) bgClass = 'style="background: #94a3b8; color: white; font-weight: bold;"'; // Prata
-            else if (index === 2) bgClass = 'style="background: #b45309; color: white; font-weight: bold;"'; // Bronze
-            
+            // Lógica simples de destaque (pode personalizar no CSS)
+            let classeCss = "";
+            if (index === 0) classeCss = "ranking-ouro";
+            else if (index === 1) classeCss = "ranking-prata";
+            else if (index === 2) classeCss = "ranking-bronze";
+
             return `
-              <tr ${bgClass}>
+              <tr class="${classeCss}">
                 <td>${index + 1}º</td>
+                <td>${item.app.toUpperCase()}</td>
                 <td>${item.users?.nome || "Músico"}</td>
                 <td>${item.acertos}</td>
                 <td>${formatarTempo(item.tempo_segundos)}</td>
