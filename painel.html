@@ -21,6 +21,9 @@
       ><button class="menu-btn" onclick="abrirPagina('intervalos')">
         🎵 Intervalos
       </button>
+      <button class="menu-btn" onclick="abrirRanking('notas')">
+        🥇 Ranking Notas
+      </button>
       <button class="menu-btn" onclick="abrirRanking('intervalos')">
         🥇 Ranking Intervalos
       </button>
@@ -135,74 +138,94 @@
         abrirPagina("notas");
       };
 
-      async function abrirRanking() {
+      async function abrirRanking(nomeApp) {
         const main = document.getElementById("conteudo-principal");
-        main.innerHTML = `<div class="titulo"><h1>Carregando ranking...</h1></div>`;
 
-        // Buscamos com JOIN na tabela users para pegar o nome
-        // Ordenamos: 1º pelo app, 2º pelos acertos (mais é melhor), 3º pelo tempo (menos é melhor)
+        // 1. Títulos e Filtros
+        const nomesBonitos = {
+          notas: "Notas no Instrumento",
+          intervalos: "Intervalos",
+        };
+
+        main.innerHTML = `
+    <div class="titulo"><h1>🥇 Ranking: ${nomesBonitos[nomeApp]}</h1></div>
+    <div class="filtros" style="display:flex; justify-content:flex-end; margin-bottom:20px;">
+       <select id="filtro-modo" onchange="filtrarRanking('${nomeApp}')">
+          <option value="todos">Todos os Modos</option>
+          </select>
+    </div>
+    <div id="tabela-ranking" class="historico-box"></div>
+  `;
+
+        // 2. Busca dados do app selecionado
         const { data, error } = await supabaseClient
           .from("historico_jogadas")
           .select("*, users(nome)")
-          .order("app", { ascending: true })
+          .eq("app", nomeApp)
           .order("acertos", { ascending: false })
           .order("tempo_segundos", { ascending: true });
 
         if (error) {
-          console.error("Erro ao buscar ranking:", error);
-          main.innerHTML = `<div class="titulo"><h1>Erro ao carregar</h1></div>`;
+          console.error(error);
           return;
         }
 
-        let html = `
-    <div class="titulo"><h1>🏆 Ranking Geral</h1></div>
-    <div class="historico-box">
-      <table>
-        <thead>
-          <tr>
-            <th>Jogo</th>
-            <th>Modo</th>
-            <th>Posição</th>
-            <th>Usuário</th>
-            <th>Acertos</th>
-            <th>Tempo</th>
-          </tr>
-        </thead>
-        <tbody>
-  `;
+        // 3. Preencher o Select com os modos únicos encontrados
+        const select = document.getElementById("filtro-modo");
+        const modos = [
+          ...new Set(data.map((item) => item.modo_jogo).filter(Boolean)),
+        ];
+        modos.forEach((modo) => {
+          select.innerHTML += `<option value="${modo}">${modo}</option>`;
+        });
 
-        let jogoAtual = "";
+        // 4. Salvar dados globalmente para o filtro funcionar depois
+        window.rankingData = data;
+        renderizarTabela(data);
+      }
+
+      // Função auxiliar para renderizar a tabela
+      function renderizarTabela(data) {
+        const container = document.getElementById("tabela-ranking");
+        let html = `<table><thead><tr><th>Modo</th><th>Posição</th><th>Usuário</th><th>Acertos</th><th>Tempo</th></tr></thead><tbody>`;
+
+        let modoAtual = "";
         let posicao = 0;
 
         data.forEach((item) => {
-          // Se o jogo mudou, reinicia a contagem de posição
-          if (item.app !== jogoAtual) {
-            jogoAtual = item.app;
+          if (item.modo_jogo !== modoAtual) {
+            modoAtual = item.modo_jogo;
             posicao = 1;
           } else {
             posicao++;
           }
-          const detalhe = item.modo_jogo || "---";
-          // Destaque visual apenas para o Top 3 de cada jogo
-          let classeCss = "";
-          if (posicao === 1) classeCss = "ranking-ouro";
-          else if (posicao === 2) classeCss = "ranking-prata";
-          else if (posicao === 3) classeCss = "ranking-bronze";
 
-          html += `
-      <tr class="${classeCss}">
-        <td><strong>${item.app.toUpperCase()}</strong></td>
-        <td>${detalhe}</td>
-        <td>${posicao}º</td>
-        <td>${item.users?.nome || "Músico"}</td>
-        <td>${item.acertos}</td>
-        <td>${formatarTempo(item.tempo_segundos)}</td>
-      </tr>
-    `;
+          html += `<tr>
+      <td>${item.modo_jogo || "Geral"}</td>
+      <td>${posicao}º</td>
+      <td>${item.users?.nome || "Músico"}</td>
+      <td>${item.acertos}</td>
+      <td>${formatarTempo(item.tempo_segundos)}</td>
+    </tr>`;
         });
 
-        html += `</tbody></table></div>`;
-        main.innerHTML = html;
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+      }
+
+      // Função de Filtro
+      function filtrarRanking(app) {
+        const modoSelecionado = document.getElementById("filtro-modo").value;
+        const dados = window.rankingData;
+
+        if (modoSelecionado === "todos") {
+          renderizarTabela(dados);
+        } else {
+          const filtrados = dados.filter(
+            (i) => i.modo_jogo === modoSelecionado,
+          );
+          renderizarTabela(filtrados);
+        }
       }
       // ======================================================
       // ABRIR PÁGINA
