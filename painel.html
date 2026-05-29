@@ -21,6 +21,9 @@
       ><button class="menu-btn" onclick="abrirPagina('intervalos')">
         🎼 Intervalos
       </button>
+      <button class="menu-btn" onclick="abrirRanking('intervalos')">
+  🥇 Ranking Intervalos
+</button>
       <div id="txt_adm" style="display: none; text-align: center">
         Configurações de admin:
       </div>
@@ -113,29 +116,67 @@
         // HISTÓRICO
         // ==================================================
 
-        const { data, error } = await supabaseClient
-          .from("historico_jogadas")
-          .select("*")
-          .eq("identificador", usuarioAtual.id)
-          .order("created_at", {
-            ascending: false,
-          });
+     const { data, error } = await supabaseClient
+  .from("historico_jogadas")
+  .select("*, users(nome)") // Isso pega os dados do usuário junto
+  .order("acertos", { ascending: false })
+  .order("tempo_segundos", { ascending: true });
 
-        if (error) {
-          console.error(error);
-          return;
-        }
+if (error) {
+  console.error(error);
+  return;
+}
 
-        historicoGlobal = data || [];
-        console.log("HISTORICO:", historicoGlobal);
-
-        historicoGlobal.forEach((item) => {
-          console.log("APP DO BANCO:", item.app);
-        });
+historicoGlobal = data || [];
         // abre tela inicial
         abrirPagina("notas");
       };
+async function abrirRanking(nomeApp) {
+  const main = document.getElementById("conteudo-principal");
+  
+  // Filtra apenas o app desejado e remove duplicatas (mantendo apenas a melhor partida de cada user)
+  const registros = historicoGlobal.filter(h => h.app === nomeApp);
+  const rankingMap = new Map();
 
+  registros.forEach(item => {
+    const userId = item.identificador;
+    if (!rankingMap.has(userId) || 
+        item.acertos > rankingMap.get(userId).acertos || 
+        (item.acertos === rankingMap.get(userId).acertos && item.tempo_segundos < rankingMap.get(userId).tempo_segundos)) {
+      rankingMap.set(userId, item);
+    }
+  });
+
+  const rankingOrdenado = Array.from(rankingMap.values())
+    .sort((a, b) => b.acertos - a.acertos || a.tempo_segundos - b.tempo_segundos);
+
+  let html = `
+    <div class="titulo"><h1>🏆 Ranking: ${nomeApp}</h1></div>
+    <div class="historico-box">
+      <table>
+        <thead><tr><th>Pos</th><th>Usuário</th><th>Acertos</th><th>Tempo</th></tr></thead>
+        <tbody>
+          ${rankingOrdenado.map((item, index) => {
+            let bgClass = "";
+            if (index === 0) bgClass = 'style="background: #fbbf24; color: black; font-weight: bold;"'; // Ouro
+            else if (index === 1) bgClass = 'style="background: #94a3b8; color: white; font-weight: bold;"'; // Prata
+            else if (index === 2) bgClass = 'style="background: #b45309; color: white; font-weight: bold;"'; // Bronze
+            
+            return `
+              <tr ${bgClass}>
+                <td>${index + 1}º</td>
+                <td>${item.users?.nome || "Músico"}</td>
+                <td>${item.acertos}</td>
+                <td>${formatarTempo(item.tempo_segundos)}</td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+  main.innerHTML = html;
+}
       // ======================================================
       // ABRIR PÁGINA
       // ======================================================

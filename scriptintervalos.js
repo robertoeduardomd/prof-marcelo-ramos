@@ -344,16 +344,20 @@ function embaralhar(array) {
 async function finalizarJogo() {
   clearInterval(intervaloTimer);
   
+  // Captura o modo atual para salvar no banco
+  const modoSelecao = document.querySelector("input[name='modo']:checked").value;
+  const infoModo = modoSelecao === "intervalo" ? selectIntervalo.value : selectNota.value;
+
   if (typeof SistemaAcesso !== 'undefined') {
-    // Enviamos 'tempo / 100' para converter centésimos para segundos decimais
-    await SistemaAcesso.salvarPartida("intervalos", acertos, erros, tempo / 100);
+    // Passamos o infoModo como 5º argumento
+    await SistemaAcesso.salvarPartida("intervalos", acertos, erros, tempo / 100, infoModo);
   }
 
   perguntaEl.innerText = "Fim do treino 🎉";
   jogoIniciado = false;
   configEl.style.display = "block";
   btnIniciar.innerText = "Reiniciar";
-  btnIniciar.style.display = "block"; // Garante que o botão apareça
+  btnIniciar.style.display = "block";
 }
 
 function atualizarPlacar() {

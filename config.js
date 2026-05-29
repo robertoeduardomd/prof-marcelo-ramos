@@ -85,7 +85,7 @@ const SistemaAcesso = {
   // 3. Salva partida
   // No config.js
   // 3. Salva partida
-  async salvarPartida(nomeApp, acertos, erros, tempo) {
+  async salvarPartida(nomeApp, acertos, erros, tempo, modoJogo=null) {
     console.log("🚀 salvarPartida foi chamada");
 
     const id = await this.obterIdentificador();
@@ -98,6 +98,7 @@ const SistemaAcesso = {
       acertos: acertos,
       erros: erros,
       tempo_segundos: tempo,
+      modo_jogo: modoJogo
     };
 
     console.log("📦 Dados enviados:", dados);

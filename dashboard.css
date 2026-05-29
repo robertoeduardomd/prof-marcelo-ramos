@@ -389,3 +389,19 @@ button {
         top: 0;
     }
 }
+/* Adicione ao seu dashboard.css */
+tr[style*="background"] {
+    border-radius: 10px;
+    transition: transform 0.2s;
+}
+
+tr:hover {
+    filter: brightness(1.2);
+}
+/* Efeito de destaque para o Top 3 no Ranking */
+.ouro { background: #fbbf24 !important; color: #000; font-weight: bold; }
+.prata { background: #94a3b8 !important; color: #fff; font-weight: bold; }
+.bronze { background: #b45309 !important; color: #fff; font-weight: bold; }
+
+/* Transição ao passar o mouse */
+tr { transition: background 0.3s; }
