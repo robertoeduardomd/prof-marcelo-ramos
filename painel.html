@@ -116,21 +116,25 @@
         // HISTÓRICO
         // ==================================================
 
-     const { data, error } = await supabaseClient
+    // Substitua o bloco de histórico no seu window.onload por este:
+const { data, error } = await supabaseClient
   .from("historico_jogadas")
-  .select("*, users(nome)") // Isso pega os dados do usuário junto
+  .select("*, users(nome)")
   .order("acertos", { ascending: false })
   .order("tempo_segundos", { ascending: true });
 
 if (error) {
-  console.error(error);
+  console.error("Erro ao buscar histórico:", error);
   return;
 }
 
 historicoGlobal = data || [];
-        // abre tela inicial
-        abrirPagina("notas");
-      };
+console.log("Histórico carregado:", historicoGlobal); // Veja no F12 se o array está vazio ou preenchido
+
+// Apenas chama se houver dados ou garante que a tela abra mesmo vazia
+abrirPagina("notas");
+};
+
 async function abrirRanking() {
   const main = document.getElementById("conteudo-principal");
 
@@ -714,7 +718,8 @@ async function abrirRanking() {
       // ======================================================
 
     function formatarTempo(segundos) {
-    if (!segundos || isNaN(segundos)) return "--:--";
+
+    if (segundos === null || segundos === undefined || isNaN(segundos)) return "--:--";
 
     // 1. Calcula minutos totais
     const minutos = Math.floor(segundos / 60)
