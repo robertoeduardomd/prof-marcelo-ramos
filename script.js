@@ -351,15 +351,13 @@ async function finalizarJogo() {
 
   btnIniciar.style.display = "block";
   btnIniciar.innerText = "Reiniciar";
-
-
-  // Envia para o Supabase para histórico e controle de conta
-// Dentro da sua função finalizarJogo, mantenha a chamada como está:
+  const instrumentoSelecionado = document.getElementById("instrumento").value;
 await SistemaAcesso.salvarPartida(
    "notas",
    acertos,
    erros,
-   tempo / 100 // Enviamos em segundos com casas decimais (ex: 35.45)
+   tempo / 100, // Enviamos em segundos com casas decimais (ex: 35.45)
+   instrumentoSelecionado
 );
 
   jogoIniciado = false;
