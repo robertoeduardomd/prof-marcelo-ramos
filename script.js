@@ -352,7 +352,7 @@ async function finalizarJogo() {
   btnIniciar.style.display = "block";
   btnIniciar.innerText = "Reiniciar";
   const instrumentoSelecionado = document.getElementById("instrumento").value;
-if(instrumentoSelecionado == "guitarra"){
+if(instrumentoSelecionado === "guitarra"){
   instrumentoSelecionado = "guitarra/violão";
 }
 await SistemaAcesso.salvarPartida(
