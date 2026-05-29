@@ -138,18 +138,25 @@
             </p>
         </div>
     </div>
-    <div id="modal-esqueci" class="modal-overlay" style="display:none;">
-    <div class="modal-box">
+   <div id="modal-esqueci" class="modal-overlay" style="display: none">
+      <div class="modal-box">
         <h2>Recuperar Acesso</h2>
         <p>Digite seu e-mail para receber o link de redefinição.</p>
-              <br><br>
-        <input type="email" id="email-recuperacao" placeholder="seu-email@exemplo.com">
-        <div class="modal-btns">
-            <button onclick="fecharModal('modal-esqueci')" class="btn-cancelar">Cancelar</button>
-            <button onclick="processarRecuperacao()" class="btn-confirmar">Enviar</button>
+        <br><br>
+        <div class="campo">
+          <input type="email" id="email-recuperacao" required /><br /><br />
+          <label for="email-recuperacao">email:</label><br />
         </div>
+        <div class="modal-btns">
+          <button onclick="fecharModal('modal-esqueci')" class="btn-cancelar">
+            Cancelar
+          </button>
+          <button onclick="processarRecuperacao()" class="btn-confirmar">
+            Redefinir
+          </button>
+        </div>
+      </div>
     </div>
-</div>
 
 <div id="modal-resetar" class="modal-overlay" style="display:none;">
     <div class="modal-box">

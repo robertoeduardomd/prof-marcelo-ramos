@@ -340,8 +340,14 @@ function embaralhar(array) {
   }
 }
 
-function finalizarJogo() {
+
+async function finalizarJogo() {
   clearInterval(intervaloTimer);
+  
+  if (typeof SistemaAcesso !== 'undefined') {
+      await SistemaAcesso.salvarPartida("intervalos", acertos, erros, tempo);
+  }
+
   perguntaEl.innerText = "Fim do treino 🎉";
   jogoIniciado = false;
   configEl.style.display = "block";
