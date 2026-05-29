@@ -306,6 +306,7 @@ function criarOpcoes() {
 }
 
 function responder(correto, notaClicada = null) {
+  if (bloqueado) return; // Proteção extra contra cliques repetidos
   bloqueado = true;
   total++;
 
@@ -314,23 +315,24 @@ function responder(correto, notaClicada = null) {
     mostrarToast("✅ Correto!", "sucesso");
   } else {
     erros++;
-    mostrarToast(
-      `❌ Correto: ${formatarExibicaoNota(perguntaAtual.resposta)}`,
-      "erro",
-    );
-
-    // Toca som de erro apenas
+    mostrarToast(`❌ Correto: ${formatarExibicaoNota(perguntaAtual.resposta)}`, "erro");
     tocarSomErro();
   }
 
   atualizarPlacar();
   indiceAtual++;
 
-  // Passa para próxima pergunta imediatamente
+  // A MUDANÇA ESTÁ AQUI:
+  // Só chamamos gerarPergunta se ainda houver perguntas restantes.
+  // Caso contrário, chamamos finalizarJogo explicitamente.
   setTimeout(() => {
-    bloqueado = false;
-    gerarPergunta();
-  }, 400); // Tempo reduzido para jogo rápido
+    if (indiceAtual < perguntas.length) {
+      bloqueado = false;
+      gerarPergunta();
+    } else {
+      finalizarJogo(); // Força o fim apenas aqui
+    }
+  }, 400); 
 }
 
 function embaralhar(array) {
@@ -342,14 +344,17 @@ function embaralhar(array) {
 
 
 async function finalizarJogo() {
+  // Trava de segurança para não salvar duas vezes
+  if (jogoFinalizado) return;
+  jogoFinalizado = true; 
+
   clearInterval(intervaloTimer);
   
-  // Captura o modo atual para salvar no banco
   const modoSelecao = document.querySelector("input[name='modo']:checked").value;
   const infoModo = modoSelecao === "intervalo" ? selectIntervalo.value : selectNota.value;
 
+  // Só salva se o jogo realmente terminou
   if (typeof SistemaAcesso !== 'undefined') {
-    // Passamos o infoModo como 5º argumento
     await SistemaAcesso.salvarPartida("intervalos", acertos, erros, tempo / 100, infoModo);
   }
 
