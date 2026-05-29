@@ -98,7 +98,7 @@ const SistemaAcesso = {
       acertos: acertos,
       erros: erros,
       tempo_segundos: tempo,
-      modo_jogo: modoJogo
+      modo_jogo: modoJogo || null
     };
 
     console.log("📦 Dados enviados:", dados);

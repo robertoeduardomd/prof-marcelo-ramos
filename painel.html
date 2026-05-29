@@ -17,13 +17,13 @@
       </div>
       <button class="menu-btn" onclick="abrirConfiguracoes()">👤 Perfil</button
       ><button class="menu-btn" onclick="abrirPagina('notas')">
-        🎵 Notas no Instrumento</button
+        🎼 Notas no Instrumento</button
       ><button class="menu-btn" onclick="abrirPagina('intervalos')">
-        🎼 Intervalos
+        🎵 Intervalos
       </button>
       <button class="menu-btn" onclick="abrirRanking('intervalos')">
-  🥇 Ranking Intervalos
-</button>
+        🥇 Ranking Intervalos
+      </button>
       <div id="txt_adm" style="display: none; text-align: center">
         Configurações de admin:
       </div>
@@ -116,36 +116,36 @@
         // HISTÓRICO
         // ==================================================
 
-    // Substitua o bloco de histórico no seu window.onload por este:
-const { data, error } = await supabaseClient
-  .from("historico_jogadas")
-  .select("*, users(nome)")
-  .order("acertos", { ascending: false })
-  .order("tempo_segundos", { ascending: true });
+        // Substitua o bloco de histórico no seu window.onload por este:
+        const { data, error } = await supabaseClient
+          .from("historico_jogadas")
+          .select("*")
+          .order("acertos", { ascending: false })
+          .order("tempo_segundos", { ascending: true });
 
-if (error) {
-  console.error("Erro ao buscar histórico:", error);
-  return;
-}
+        if (error) {
+          console.error("Erro ao buscar histórico:", error);
+          return;
+        }
 
-historicoGlobal = data || [];
-console.log("Histórico carregado:", historicoGlobal); // Veja no F12 se o array está vazio ou preenchido
+        historicoGlobal = data || [];
+        console.log("Histórico carregado:", historicoGlobal); // Veja no F12 se o array está vazio ou preenchido
 
-// Apenas chama se houver dados ou garante que a tela abra mesmo vazia
-abrirPagina("notas");
-};
+        // Apenas chama se houver dados ou garante que a tela abra mesmo vazia
+        abrirPagina("notas");
+      };
 
-async function abrirRanking() {
-  const main = document.getElementById("conteudo-principal");
+      async function abrirRanking() {
+        const main = document.getElementById("conteudo-principal");
 
-  // Ordena todos os registros do histórico global
-  // Primeiro pelo nome do App, depois pelo número de acertos
-  const rankingOrdenado = [...historicoGlobal].sort((a, b) => {
-    if (a.app !== b.app) return a.app.localeCompare(b.app);
-    return b.acertos - a.acertos || a.tempo_segundos - b.tempo_segundos;
-  });
+        // Ordena todos os registros do histórico global
+        // Primeiro pelo nome do App, depois pelo número de acertos
+        const rankingOrdenado = [...historicoGlobal].sort((a, b) => {
+          if (a.app !== b.app) return a.app.localeCompare(b.app);
+          return b.acertos - a.acertos || a.tempo_segundos - b.tempo_segundos;
+        });
 
-  let html = `
+        let html = `
     <div class="titulo"><h1>🏆 Ranking Geral</h1></div>
     <div class="historico-box">
       <table>
@@ -159,14 +159,15 @@ async function abrirRanking() {
           </tr>
         </thead>
         <tbody>
-          ${rankingOrdenado.map((item, index) => {
-            // Lógica simples de destaque (pode personalizar no CSS)
-            let classeCss = "";
-            if (index === 0) classeCss = "ranking-ouro";
-            else if (index === 1) classeCss = "ranking-prata";
-            else if (index === 2) classeCss = "ranking-bronze";
+          ${rankingOrdenado
+            .map((item, index) => {
+              // Lógica simples de destaque (pode personalizar no CSS)
+              let classeCss = "";
+              if (index === 0) classeCss = "ranking-ouro";
+              else if (index === 1) classeCss = "ranking-prata";
+              else if (index === 2) classeCss = "ranking-bronze";
 
-            return `
+              return `
               <tr class="${classeCss}">
                 <td>${index + 1}º</td>
                 <td>${item.app.toUpperCase()}</td>
@@ -175,130 +176,85 @@ async function abrirRanking() {
                 <td>${formatarTempo(item.tempo_segundos)}</td>
               </tr>
             `;
-          }).join("")}
+            })
+            .join("")}
         </tbody>
       </table>
     </div>
   `;
-  main.innerHTML = html;
-}
+        main.innerHTML = html;
+      }
       // ======================================================
       // ABRIR PÁGINA
       // ======================================================
 
-    function abrirPagina(nomeApp) {
+    async function abrirPagina(nomeApp) {
   const main = document.getElementById("conteudo-principal");
-  const dados = historicoGlobal.filter((item) => item.app === nomeApp);
+  main.innerHTML = `<div class="titulo"><h1>Carregando...</h1></div>`;
 
-  // 1. Lógica para encontrar o registro recordista
-  let melhorPartida = null;
+  // 1. Busca os dados apenas deste app para este usuário
+  const { data, error } = await supabaseClient
+    .from("historico_jogadas")
+    .select("*")
+    .eq("app", nomeApp)
+    .eq("identificador", usuarioAtual.id) // Garante que só pega o do usuário
+    .order("acertos", { ascending: false })
+    .order("tempo_segundos", { ascending: true });
 
-  dados.forEach((item) => {
-    if (!melhorPartida) {
-      melhorPartida = item;
-      return;
-    }
+  if (error) {
+    console.error("Erro ao buscar histórico:", error);
+    main.innerHTML = `<div class="titulo"><h1>Erro ao carregar</h1></div>`;
+    return;
+  }
 
-    // Prioridade 1: Mais acertos é melhor
-    if ((item.acertos || 0) > (melhorPartida.acertos || 0)) {
-      melhorPartida = item;
-    } 
-    // Prioridade 2: Se acertos forem iguais, menor tempo é melhor
-    else if ((item.acertos || 0) === (melhorPartida.acertos || 0)) {
-      if (item.tempo_segundos < melhorPartida.tempo_segundos) {
-        melhorPartida = item;
-      }
-    }
-  });
+  const dados = data || [];
 
+  // 2. Lógica para encontrar o recorde (agora funciona pois 'dados' está preenchido)
+  let melhorPartida = dados.length > 0 ? dados[0] : null;
+
+  // 3. Renderização
   const nomesBonitos = {
     notas: "Notas no Braço do Instrumento",
     intervalos: "Intervalos",
   };
 
   const tituloBonito = nomesBonitos[nomeApp] || nomeApp;
-  const ultimaJogada = dados[0];
+  const ultimaJogada = dados.length > 0 ? dados[0] : null;
 
   main.innerHTML = `
-      <div class="titulo">
-          <h1>${tituloBonito}</h1>
-      </div>
-
-      <div class="cards-topo">
-          <div class="info-card">
-              <span>🏆 Seu Recorde</span>
-              <h2>
-                  ${melhorPartida ? formatarTempo(melhorPartida.tempo_segundos) : "--:--"}
-              </h2>
-              <small style="color: #94a3b8;">${melhorPartida ? melhorPartida.acertos + " acertos" : "0 acertos"}</small>
-          </div>
-
-          <div class="info-card">
-              <span>🎮 Partidas Jogadas</span>
-              <h2>${dados.length}</h2>
-          </div>
-
-          <div class="info-card">
-              <span>📅 Última Tentativa</span>
-              <h2 style="font-size:20px;">
-                  ${
-                    ultimaJogada
-                      ? new Date(ultimaJogada.created_at).toLocaleDateString("pt-BR")
-                      : "--"
-                  }
-              </h2>
-          </div>
-      </div>
-
-      <div class="historico-box">
-          <div class="historico-topo">
-              <h2>Histórico</h2>
-          </div>
-          ${
-            dados.length === 0
-              ? `<div class="vazio">Nenhuma partida encontrada.</div>`
-              : `
-              <table>
-                  <thead>
-                      <tr>
-                          <th>Data</th>
-                          <th>Acertos</th>
-                          <th>Erros</th>
-                          <th>Tempo</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      ${dados
-                        .map((item) => {
-                          // Destaque se for o recorde (mesma lógica usada no loop acima)
-                          const ehRecorde = melhorPartida && 
-                                            item.acertos === melhorPartida.acertos && 
-                                            item.tempo_segundos === melhorPartida.tempo_segundos;
-                          
-                          const classeDestaque = ehRecorde ? 'class="linha-destaque"' : "";
-
-                          return `
-                          <tr ${classeDestaque}>
-                              <td>${new Date(item.created_at).toLocaleDateString("pt-BR")}</td>
-                              <td>${item.acertos || 0}</td>
-                              <td>${item.erros || 0}</td>
-                              <td>${formatarTempo(item.tempo_segundos)}</td>
-                          </tr>
-                          `;
-                        })
-                        .join("")}
-                  </tbody>
-              </table>
-              `
-          }
-      </div>
-      <br><br>
-      <div class="apps">
-        <a href="notas_instrumento.html" class="btn btnnotas">🎸 Notas no braco do instrumento</a>
-        <a href="intervalos.html" class="btn btn-intervalos">
-            <span class="silaba">🎵</span> <span class="silaba">in</span><span class="silaba">ter</span><span class="silaba">valos</span>
-        </a>
-      </div>
+    <div class="titulo"><h1>${tituloBonito}</h1></div>
+    <div class="cards-topo">
+        <div class="info-card">
+            <span>🏆 Seu Recorde</span>
+            <h2>${melhorPartida ? formatarTempo(melhorPartida.tempo_segundos) : "--:--"}</h2>
+            <small style="color: #94a3b8;">${melhorPartida ? melhorPartida.acertos + " acertos" : "0 acertos"}</small>
+        </div>
+        <div class="info-card">
+            <span>🎮 Partidas Jogadas</span>
+            <h2>${dados.length}</h2>
+        </div>
+        <div class="info-card">
+            <span>📅 Última Tentativa</span>
+            <h2 style="font-size:20px;">${ultimaJogada ? new Date(ultimaJogada.created_at).toLocaleDateString("pt-BR") : "--"}</h2>
+        </div>
+    </div>
+    <div class="historico-box">
+        <div class="historico-topo"><h2>Histórico</h2></div>
+        ${dados.length === 0 ? `<div class="vazio">Nenhuma partida encontrada.</div>` : `
+        <table>
+            <thead><tr><th>Data</th><th>Acertos</th><th>Erros</th><th>Tempo</th></tr></thead>
+            <tbody>
+                ${dados.map((item) => `
+                    <tr>
+                        <td>${new Date(item.created_at).toLocaleDateString("pt-BR")}</td>
+                        <td>${item.acertos || 0}</td>
+                        <td>${item.erros || 0}</td>
+                        <td>${formatarTempo(item.tempo_segundos)}</td>
+                    </tr>
+                `).join("")}
+            </tbody>
+        </table>`}
+    </div>
   `;
 }
 
@@ -717,27 +673,27 @@ async function abrirRanking() {
       // FORMATAR TEMPO
       // ======================================================
 
-    function formatarTempo(segundos) {
+      function formatarTempo(segundos) {
+        if (segundos === null || segundos === undefined || isNaN(segundos))
+          return "--:--";
 
-    if (segundos === null || segundos === undefined || isNaN(segundos)) return "--:--";
+        // 1. Calcula minutos totais
+        const minutos = Math.floor(segundos / 60)
+          .toString()
+          .padStart(2, "0");
 
-    // 1. Calcula minutos totais
-    const minutos = Math.floor(segundos / 60)
-        .toString()
-        .padStart(2, "0");
+        // 2. Calcula segundos inteiros (o que sobra após tirar os minutos)
+        const segundosInteiros = Math.floor(segundos % 60);
 
-    // 2. Calcula segundos inteiros (o que sobra após tirar os minutos)
-    const segundosInteiros = Math.floor(segundos % 60);
+        // 3. Calcula os centésimos (pega o resto da divisão por 1, multiplica por 100 e arredonda)
+        const centesimos = Math.round((segundos % 1) * 100);
 
-    // 3. Calcula os centésimos (pega o resto da divisão por 1, multiplica por 100 e arredonda)
-    const centesimos = Math.round((segundos % 1) * 100);
+        // 4. Formata tudo com preenchimento de zero à esquerda
+        const segFormatado = segundosInteiros.toString().padStart(2, "0");
+        const centFormatado = centesimos.toString().padStart(2, "0");
 
-    // 4. Formata tudo com preenchimento de zero à esquerda
-    const segFormatado = segundosInteiros.toString().padStart(2, "0");
-    const centFormatado = centesimos.toString().padStart(2, "0");
-
-    return `${minutos}:${segFormatado}.${centFormatado}`;
-}
+        return `${minutos}:${segFormatado}.${centFormatado}`;
+      }
 
       function mostrarToast(mensagem, tipo = "verde") {
         const container = document.getElementById("toast-container");
