@@ -276,6 +276,7 @@ td {
     z-index: 10;
     background: #1e293b;
     color:white;
+    border-radius: 20px;
 }
 
 button {
