@@ -390,7 +390,7 @@ function mostrarToast(msg, tipo) {
 }
 
 function iniciarJogo() {
-  jogojogoFinalizado = false;
+  jogoFinalizado = false;
   jogoIniciado = true;
   configEl.style.display = "none";
   acertos = 0;
