@@ -75,7 +75,7 @@ let intervaloTimer;
 let synth;
 let synthErro;
 let notaAtual = null;
-
+let jogoFinalizado = false;
 // =======================
 // 🔊 AUDIO
 // =======================
@@ -343,7 +343,7 @@ function embaralhar(array) {
 
 async function finalizarJogo() {
   // A trava aqui impede o salvamento duplicado sem precisar mexer no iniciarJogo
-  if (typeof jogoFinalizado !== 'undefined' && jogoFinalizado) return;
+  if (jogoFinalizado) return;
   jogoFinalizado = true; 
 
   clearInterval(intervaloTimer); // Isso garante que o cronômetro pare
@@ -390,6 +390,7 @@ function mostrarToast(msg, tipo) {
 }
 
 function iniciarJogo() {
+  jogojogoFinalizado = false;
   jogoIniciado = true;
   configEl.style.display = "none";
   acertos = 0;

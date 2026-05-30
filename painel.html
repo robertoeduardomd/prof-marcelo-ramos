@@ -143,7 +143,7 @@
 
         // 1. Títulos e Filtros
         const nomesBonitos = {
-          notas: "Notas no Braço do instrumento",
+          notas: "Notas no braço do instrumento",
           intervalos: "Intervalos",
         };
 
@@ -251,7 +251,10 @@
         }
 
         const dados = data || [];
-
+        const linksJogos = {
+    notas: "notas_instrumento.html",
+    intervalos: "intervalos.html"
+  };
         // 2. Lógica para encontrar o recorde (agora funciona pois 'dados' está preenchido)
         let melhorPartida = dados.length > 0 ? dados[0] : null;
 
