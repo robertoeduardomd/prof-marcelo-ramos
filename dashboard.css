@@ -124,7 +124,7 @@
       }
 
       .historico-topo h2 {
-        color: #facc15;
+        color: #947600;
       }
 
       table {
@@ -399,8 +399,8 @@ tr:hover {
     filter: brightness(1.9);
 }
 /* Efeito de destaque para o Top 3 no Ranking */
-.ouro { background: #fbbf24 !important; color: #01086b; font-weight: bold; }
-.prata { background: #94a3b8 !important; color: #01086b; font-weight: bold; }
+.ouro { background: lightyellow !important; color: #01086b; font-weight: bold; }
+.prata { background: #94a3b8 !important; color: #ffffff; font-weight: bold; }
 .bronze { background: #b45309 !important; color: #fff; font-weight: bold; }
 
 /* Transição ao passar o mouse */
