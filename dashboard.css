@@ -274,6 +274,8 @@ td {
     border-bottom: 1px solid #334155;
     text-align: left;
     z-index: 10;
+    background: #1e293b;
+    color:white;
 }
 
 button {
@@ -402,9 +404,9 @@ tr:hover {
     filter: brightness(1.9);
 }
 /* Efeito de destaque para o Top 3 no Ranking */
-.ouro { border:3px solid rgb(253, 249, 10) !important;  color: #01086b; font-weight: bold;z-index: 20; }
-.prata { border:3px solid #94a3b8 !important; color: #01086b; font-weight: bold;z-index: 19; }
-.bronze { border:3px solid #b45309 !important; color: #01086b; font-weight: bold;z-index: 18; }
+.ouro { border:4px solid rgb(253, 249, 10) !important; font-weight: bold;z-index: 20; }
+.prata { border:3px solid #94a3b8 !important; font-weight: bold;z-index: 19; }
+.bronze { border:2px solid #b45309 !important; font-weight: bold;z-index: 18; }
 
 /* Transição ao passar o mouse */
 tr { transition: background 0.3s; }
