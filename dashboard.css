@@ -411,4 +411,4 @@ tr:hover {
 .bronze { border:2px solid #b45309 !important;color:#b45309 !important; font-weight: bold;z-index: 18;border-radius: 20px; }
 
 /* Transição ao passar o mouse */
-tr { transition: background 0.3s; }
+tr { transition: all 0.3s; }
