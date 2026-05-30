@@ -138,16 +138,16 @@
         abrirPagina("notas");
       };
 
-    async function abrirRanking(nomeApp) {
-  const main = document.getElementById("conteudo-principal");
+      async function abrirRanking(nomeApp) {
+        const main = document.getElementById("conteudo-principal");
 
-  // 1. Títulos e Filtros
-  const nomesBonitos = {
-    notas: "Notas no braço do instrumento",
-    intervalos: "Intervalos",
-  };
+        // 1. Títulos e Filtros
+        const nomesBonitos = {
+          notas: "Notas no braço do instrumento",
+          intervalos: "Intervalos",
+        };
 
-  main.innerHTML = `
+        main.innerHTML = `
     <div class="titulo"><h1>🥇 Ranking: ${nomesBonitos[nomeApp]}</h1></div>
     <div class="filtros" style="display:flex; justify-content:flex-end; margin-bottom:20px;">
        <select id="filtro-modo" onchange="filtrarRanking('${nomeApp}')">
@@ -157,67 +157,70 @@
     <div id="tabela-ranking" class="historico-box"></div>
   `;
 
-  // 2. Busca dados do app selecionado
-  const { data, error } = await supabaseClient
-    .from("historico_jogadas")
-    .select("*, users(nome)")
-    .eq("app", nomeApp)
-    .order("acertos", { ascending: false })
-    .order("tempo_segundos", { ascending: true });
+        // 2. Busca dados do app selecionado
+        const { data, error } = await supabaseClient
+          .from("historico_jogadas")
+          .select("*, users(nome)")
+          .eq("app", nomeApp)
+          .order("acertos", { ascending: false })
+          .order("tempo_segundos", { ascending: true });
 
-  if (error) {
-    console.error(error);
-    return;
-  }
+        if (error) {
+          console.error(error);
+          return;
+        }
 
-  // ==========================================
-  // LÓGICA DE RECORDE ÚNICO POR USUÁRIO E MODO
-  // ==========================================
-  const melhoresScores = [];
-  const usuariosVistos = new Set();
+        // ==========================================
+        // LÓGICA DE RECORDE ÚNICO POR USUÁRIO E MODO
+        // ==========================================
+        const melhoresScores = [];
+        const usuariosVistos = new Set();
 
-  data.forEach((jogada) => {
-    const modo = jogada.modo_jogo || "Geral";
-    const userId = jogada.identificador;
-    
-    // Cria uma chave única ex: "2m-123456789"
-    const chaveUnica = `${modo}-${userId}`;
+        data.forEach((jogada) => {
+          const modo = jogada.modo_jogo || "Geral";
+          const userId = jogada.identificador;
 
-    // Se ainda não vimos esse usuário neste modo, adicionamos (é o recorde dele)
-    if (!usuariosVistos.has(chaveUnica)) {
-      usuariosVistos.add(chaveUnica);
-      melhoresScores.push(jogada);
-    }
-  });
+          // Cria uma chave única ex: "2m-123456789"
+          const chaveUnica = `${modo}-${userId}`;
 
-  // Reordena o array agrupando por "modo", depois "acertos" e "tempo"
-  // Isso é essencial para a renderização das posições (1º, 2º, 3º...) funcionar certinho
-  melhoresScores.sort((a, b) => {
-    const modoA = a.modo_jogo || "";
-    const modoB = b.modo_jogo || "";
-    
-    if (modoA !== modoB) return modoA.localeCompare(modoB); // Agrupa por modo
-    if (b.acertos !== a.acertos) return b.acertos - a.acertos; // Mais acertos
-    return a.tempo_segundos - b.tempo_segundos; // Menos tempo
-  });
-  // ==========================================
+          // Se ainda não vimos esse usuário neste modo, adicionamos (é o recorde dele)
+          if (!usuariosVistos.has(chaveUnica)) {
+            usuariosVistos.add(chaveUnica);
+            melhoresScores.push(jogada);
+          }
+        });
 
-  // 3. Preencher o Select com os modos únicos encontrados
-  const select = document.getElementById("filtro-modo");
-  const modos = [
-    ...new Set(melhoresScores.map((item) => item.modo_jogo).filter(Boolean)),
-  ];
-  
-  modos.forEach((modo) => {
-    select.innerHTML += `<option value="${modo}">${modo}</option>`;
-  });
+        // Reordena o array agrupando por "modo", depois "acertos" e "tempo"
+        // Isso é essencial para a renderização das posições (1º, 2º, 3º...) funcionar certinho
+        melhoresScores.sort((a, b) => {
+          const modoA = a.modo_jogo || "";
+          const modoB = b.modo_jogo || "";
 
-  // 4. Salvar dados globalmente para o filtro funcionar depois
-  window.rankingData = melhoresScores;
-  
-  // Renderiza a tabela com a lista limpa (apenas 1 recorde por pessoa por modo)
-  renderizarTabela(melhoresScores);
-}
+          if (modoA !== modoB) return modoA.localeCompare(modoB); // Agrupa por modo
+          if (b.acertos !== a.acertos) return b.acertos - a.acertos; // Mais acertos
+          return a.tempo_segundos - b.tempo_segundos; // Menos tempo
+        });
+        // ==========================================
+
+        // 3. Preencher o Select com os modos únicos encontrados
+        const select = document.getElementById("filtro-modo");
+        const modos = [
+          ...new Set(
+            melhoresScores.map((item) => item.modo_jogo).filter(Boolean),
+          ),
+        ];
+
+        modos.forEach((modo) => {
+          select.innerHTML += `<option value="${modo}">${modo}</option>`;
+        });
+
+        // 4. Salvar dados globalmente para o filtro funcionar depois
+        window.rankingData = melhoresScores;
+
+        // Renderiza a tabela com a lista limpa (apenas 1 recorde por pessoa por modo)
+        renderizarTabela(melhoresScores);
+      }
+      // Função auxiliar para renderizar a tabela
       // Função auxiliar para renderizar a tabela
       function renderizarTabela(data) {
         const container = document.getElementById("tabela-ranking");
@@ -234,7 +237,18 @@
             posicao++;
           }
 
-          html += `<tr>
+          // Define a classe CSS baseada na posição atual
+          let classeRanking = "";
+          if (posicao === 1) {
+            classeRanking = "ouro";
+          } else if (posicao === 2) {
+            classeRanking = "prata";
+          } else if (posicao === 3) {
+            classeRanking = "bronze";
+          }
+
+          // Injeta a classe diretamente na tag <tr>
+          html += `<tr class="${classeRanking}">
       <td>${item.modo_jogo || "Geral"}</td>
       <td>${posicao}º</td>
       <td>${item.users?.nome || "Músico"}</td>
@@ -286,9 +300,9 @@
 
         const dados = data || [];
         const linksJogos = {
-    notas: "notas_instrumento.html",
-    intervalos: "intervalos.html"
-  };
+          notas: "notas_instrumento.html",
+          intervalos: "intervalos.html",
+        };
         // 2. Lógica para encontrar o recorde (agora funciona pois 'dados' está preenchido)
         let melhorPartida = dados.length > 0 ? dados[0] : null;
 
