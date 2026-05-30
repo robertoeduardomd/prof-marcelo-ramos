@@ -252,30 +252,24 @@ function formatarIntervalo(i) {
 }
 
 function gerarPergunta() {
-  if (indiceAtual >= perguntas.length) {
-    finalizarJogo();
-    return;
-  }
+  // Apenas exibe e toca a nota, quem controla o fim do jogo agora é o responder()
   perguntaAtual = perguntas[indiceAtual];
   perguntaEl.innerText = perguntaAtual.texto;
-
-  // Toca APENAS a nota base da pergunta
   tocarNota(perguntaAtual.base);
 }
 
 function criarOpcoes() {
   opcoesEl.innerHTML = "";
 
-  // Agora ambos os modos usam a mesma visualização de botões agrupados
   notas.forEach((grupo) => {
     const btn = document.createElement("div");
     btn.className = "opcao";
 
-    // Adiciona classe opcao2 se o grupo tiver exatamente 2 notas (C#/Db, etc)
     if (grupo.length === 2) {
       btn.classList.add("opcao2");
     }
 
+    // Restaurei sua lógica de cores exata aqui:
     grupo.forEach((nota) => {
       const span = document.createElement("span");
       span.textContent = formatarExibicaoNota(nota);
@@ -285,22 +279,20 @@ function criarOpcoes() {
       btn.appendChild(span);
     });
 
-    // Dentro da função criarOpcoes(), substitua o bloco do btn.onclick por:
+    // Restaurei sua lógica de resposta exata aqui:
     btn.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       if (!jogoIniciado || bloqueado) return;
 
-      // Identifica se o grupo clicado contém a resposta correta
       const correto = grupo.includes(perguntaAtual.resposta);
 
-      // Toca a nota clicada (primeira nota do grupo)
       if (grupo.length > 0) {
         tocarNota(grupo[0]);
       }
 
-      // Processa resposta imediatamente
       responder(correto, grupo.length > 0 ? grupo[0] : null);
     });
+
     opcoesEl.appendChild(btn);
   });
 }
@@ -392,18 +384,20 @@ function mostrarToast(msg, tipo) {
 function iniciarJogo() {
   jogoFinalizado = false;
   jogoIniciado = true;
+  bloqueado = false;
   configEl.style.display = "none";
   acertos = 0;
   erros = 0;
   total = 0;
   indiceAtual = 0;
+  
   gerarListaPerguntas();
   atualizarPlacar();
   iniciarTimer();
   gerarPergunta();
-  criarOpcoes();
+  
+  // PRONTO! Sem o criarOpcoes() aqui, o jogo para de bugar ao reiniciar.
 }
-
 document.querySelectorAll("input[name='modo']").forEach((r) => {
   r.addEventListener("change", () => {
     const modo = r.value;
